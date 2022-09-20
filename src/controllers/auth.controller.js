@@ -40,29 +40,13 @@ export const signin = async (req, res) => {
     res.status(400).send('Hubo un error')
   }
 }
-export const signup = async (req, res) => {
-  // Revisar si hay errores
-  const errores = validationResult(req)
-  if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
-  }
-  try {
-    //Guardar el usuario
-    const rol = await Role.findOne({ where: { nombre_rol: 'Usuario' } })
-    const newUser = req.body
-    newUser.id_rol = rol.id_rol
-    const registeredUser = await User.create(newUser)
 
-    // Token
-    jwt.sign({ id: registeredUser.id_usuario }, WORD_SECRET, {
-      expiresIn: 3600 //1 hora
-    }, (error, token) => {
-      if (error) throw error
-      // Mensaje de confirmacion
-      res.json({ token })
-    })
+export const profile = async (req, res) => {
+  try {
+    const usuario = await User.findAll({ where: { id_usuario: req.userId }, attributes: { exclude: ['password'] } })
+    res.json({ usuario })
   } catch (error) {
     console.log(error);
-    res.status(400).send('Hubo un error')
+    res.status(500).json({ msg: 'Hubo un error' })
   }
 }
