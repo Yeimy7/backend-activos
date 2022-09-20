@@ -9,7 +9,7 @@ export const verifyToken = async (req, res, next) => {
     if (!token) return res.status(403).json({ message: "No token provided" })
     const decoded = jwt.verify(token, config.WORD_SECRET)
     req.userId = decoded.id
-    const user = await User.findOne({ where: { id_usuario: req.userId }, attributes: { exclude: ['password'] } })
+    const user = await User.findOne({ where: { id_persona: req.userId }, attributes: { exclude: ['password'] } })
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
     next()
   } catch (error) {
@@ -19,7 +19,7 @@ export const verifyToken = async (req, res, next) => {
 
 export const isAdmin = async (req, res, next) => {
   try {
-    const user = await User.findOne({ where: { id_usuario: req.userId }, attributes: { exclude: ['password'] } })
+    const user = await User.findOne({ where: { id_persona: req.userId }, attributes: { exclude: ['password'] } })
     const rol = await Role.findOne({
       where: { id_rol: user.id_rol },
     })
@@ -34,7 +34,7 @@ export const isAdmin = async (req, res, next) => {
 }
 export const isSuperAdmin = async (req, res, next) => {
   try {
-    const user = await User.findOne({ where: { id_usuario: req.userId }, attributes: { exclude: ['password'] } })
+    const user = await User.findOne({ where: { id_persona: req.userId }, attributes: { exclude: ['password'] } })
     const rol = await Role.findOne({
       where: { id_rol: user.id_rol },
     })

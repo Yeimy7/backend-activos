@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize'
 import conexion from '../config/db'
 
-const Person = conexion.define('person', {
+const Person = conexion.define('persona', {
   id_persona: {
     type: Sequelize.UUID,
     primaryKey: true,
@@ -20,8 +20,8 @@ const Person = conexion.define('person', {
     allowNull: false,
   },
   telefono: {
-    type: Sequelize.STRING,
-    allowNull: false,
+    type: Sequelize.NUMBER,
+    allowNull: true,
   },
 }, {
   freezeTableName: true,
@@ -30,4 +30,4 @@ const Person = conexion.define('person', {
 
 Person.sync()
 
-export default PermissionName
+export default Person

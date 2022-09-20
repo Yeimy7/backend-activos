@@ -2,28 +2,12 @@ import * as Sequelize from 'sequelize'
 import conexion from '../config/db'
 import Role from './Role'
 import bcrypt from 'bcryptjs'
+import Person from './Person'
 
 const User = conexion.define('usuario', {
-  id_usuario: {
+  id_persona: {
     type: Sequelize.UUID,
     primaryKey: true,
-    defaultValue: Sequelize.UUIDV4
-  },
-  nombres: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  apellidos: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  ci: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  nacimiento: {
-    type: Sequelize.DATE,
-    allowNull: true,
   },
   email: {
     type: Sequelize.STRING,
@@ -37,13 +21,21 @@ const User = conexion.define('usuario', {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  adicional: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
+  avatar: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
   registro: {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW
   },
   id_rol: {
     type: Sequelize.UUID,
-    // allowNull: false,
+    allowNull: false,
   },
 }, {
   freezeTableName: true,

@@ -1,5 +1,7 @@
 import User from '../models/User'
 import Role from '../models/Role'
+import Person from '../models/Person'
+
 import jwt from 'jsonwebtoken'
 import bcryptjs from 'bcryptjs'
 import { WORD_SECRET } from '../config/config'
@@ -28,7 +30,7 @@ export const signin = async (req, res) => {
     console.log(usuario.rol.nombre_rol)
 
     // Token
-    jwt.sign({ id: usuario.id_usuario }, WORD_SECRET, {
+    jwt.sign({ id: usuario.id_persona }, WORD_SECRET, {
       expiresIn: 3600 //1 hora
     }, (error, token) => {
       if (error) throw error
@@ -43,8 +45,11 @@ export const signin = async (req, res) => {
 
 export const profile = async (req, res) => {
   try {
-    const usuario = await User.findAll({ where: { id_usuario: req.userId }, attributes: { exclude: ['password'] } })
-    res.json({ usuario })
+    const persona= await Person.findAll({ where: { id_persona: req.userId }})
+    const usuario = await User.findAll({ where: { id_persona: req.userId }, attributes: { exclude: ['password'] }, include: Role })
+    
+    const user={...{persona}, usuario}
+    res.json({ user })
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: 'Hubo un error' })
