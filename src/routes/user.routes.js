@@ -17,9 +17,9 @@ router.post('/',
     authJwt.isSuperAdmin
   ],
   userController.createUser)
-
+  router.get('/',[authJwt.verifyToken, authJwt.isAdmin], userController.getUsers)
   router.put('/up/:id', [ authJwt.verifyToken, authJwt.isSuperAdmin], userController.promoteUser)
   router.put('/down/:id', [ authJwt.verifyToken, authJwt.isSuperAdmin], userController.descendUser)
-
+  router.delete('/:userId', [authJwt.verifyToken, authJwt.isSuperAdmin], userController.deleteUserById)
 
 export default router

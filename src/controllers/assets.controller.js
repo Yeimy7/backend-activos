@@ -17,7 +17,6 @@ export const getAssets = async (req, res) => {
   } catch (error) {
     res.status(500).send('Hubo un error')
   }
-
 }
 
 export const getAssetById = async (req, res) => {
@@ -65,5 +64,4 @@ export const deleteAssetById = async (req, res) => {
     console.log(error)
     res.status(500).send('Error en el servidor')
   }
-
 }

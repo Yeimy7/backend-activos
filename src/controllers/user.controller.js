@@ -23,23 +23,27 @@ export const createUser = async (req, res) => {
       email, password, adicional, avatar, id_rol: rol.id_rol,
     }
     // newUser.id_rol = rol.id_rol
-    const registeredUser = await User.create(newUser)
+    await User.create(newUser)
 
-    // // Token
-    // jwt.sign({ id: registeredUser.id_usuario }, WORD_SECRET, {
-    //   expiresIn: 3600 //1 hora
-    // }, (error, token) => {
-    //   if (error) throw error
-    //   // Mensaje de confirmacion
-    //   res.json({ token })
-    // })
     res.status(201).json({ msg: 'Usuario creado exitosamente' })
   } catch (error) {
     console.log(error);
     res.status(400).send('Hubo un error')
   }
 }
+export const getUsers = async (_req, res) => {
+  try {
+    const users = await User.findAll({ raw: true, attributes: { exclude: ['password', 'id_rol'] }, include: Role })
+    const allDataUsers = await Promise.all(users.map(async user => {
+      const person = await Person.findOne({ raw: true, where: { id_persona: user.id_persona } })
+      return await { ...person, ...user }
 
+    }))
+    res.json(allDataUsers)
+  } catch (error) {
+    res.status(500).send('Hubo un error')
+  }
+}
 export const promoteUser = async (req, res) => {
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
@@ -85,4 +89,21 @@ export const descendUser = async (req, res) => {
     console.log(error);
     res.status(500).send('Error en el servidor')
   }
-} 
+}
+
+export const deleteUserById = async (req, res) => {
+  try {
+    let user = await User.findByPk(req.params.userId)
+
+    if (!user) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' })
+    }
+
+    await User.destroy({ where: { id_persona: req.params.userId } })
+    res.json({ msg: 'usuario eliminado correctamente' })
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Error en el servidor')
+  }
+}
