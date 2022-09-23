@@ -28,7 +28,7 @@ export const createUser = async (req, res) => {
     res.status(201).json({ msg: 'Usuario creado exitosamente' })
   } catch (error) {
     console.log(error);
-    res.status(400).send('Hubo un error')
+    res.status(400).json({ msg: 'Hubo un error al intentar registrar al usuario' })
   }
 }
 export const getUsers = async (_req, res) => {
@@ -41,7 +41,7 @@ export const getUsers = async (_req, res) => {
     }))
     res.json(allDataUsers)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los usuarios' })
   }
 }
 export const promoteUser = async (req, res) => {
@@ -64,7 +64,7 @@ export const promoteUser = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor' })
   }
 }
 export const descendUser = async (req, res) => {
@@ -87,7 +87,7 @@ export const descendUser = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor' })
   }
 }
 
@@ -104,6 +104,6 @@ export const deleteUserById = async (req, res) => {
 
   } catch (error) {
     console.log(error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error al intentar eliminar al usuario' })
   }
 }

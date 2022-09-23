@@ -39,19 +39,19 @@ export const signin = async (req, res) => {
     })
   } catch (error) {
     console.log(error);
-    res.status(400).send('Hubo un error')
+    res.status(400).json({ msg: 'Hubo un error durante el login' })
   }
 }
 
 export const profile = async (req, res) => {
   try {
-    const persona= await Person.findAll({ where: { id_persona: req.userId }})
+    const persona = await Person.findAll({ where: { id_persona: req.userId } })
     const usuario = await User.findAll({ where: { id_persona: req.userId }, attributes: { exclude: ['password'] }, include: Role })
-    
-    const user={...{persona}, usuario}
+
+    const user = { ...{ persona }, usuario }
     res.json({ user })
   } catch (error) {
     console.log(error);
-    res.status(500).json({ msg: 'Hubo un error' })
+    res.status(500).json({ msg: 'Hubo un error al encontrar su perfil' })
   }
 }
