@@ -44,7 +44,7 @@ export const getUsers = async (_req, res) => {
     res.status(500).json({ msg: 'Hubo un error al recuperar datos de los usuarios' })
   }
 }
-export const promoteUser = async (req, res) => {
+export const ascendUser = async (req, res) => {
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
     return res.status(400).json({ errores: errores.array() })
