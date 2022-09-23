@@ -25,7 +25,7 @@ export const createUser = async (req, res) => {
     // newUser.id_rol = rol.id_rol
     await User.create(newUser)
 
-    res.status(201).json({ msg: 'Usuario creado exitosamente' })
+    res.status(201).json({ id_persona: registeredPerson.id_persona, nombres, apellidos, ci, telefono, email, adicional: null, avatar: null, "rol.nombre_rol": "Usuario" })
   } catch (error) {
     console.log(error);
     res.status(400).json({ msg: 'Hubo un error al intentar registrar al usuario' })
