@@ -47,3 +47,19 @@ export const isSuperAdmin = async (req, res, next) => {
     res.status(401).json({ msg: 'Error en el servidor' })
   }
 }
+
+export const isSuperAdminOrAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ where: { id_persona: req.userId }, attributes: { exclude: ['password'] } })
+    const rol = await Role.findOne({
+      where: { id_rol: user.id_rol },
+    })
+    if (rol.nombre_rol === 'Super-admin' || rol.nombre_rol === 'Administrador') {
+      next()
+      return
+    }
+    return res.status(403).json({ msg: 'Requiere el rol de Super-admin o Administrador' })
+  } catch (error) {
+    res.status(401).json({ msg: 'Error en el servidor' })
+  }
+}

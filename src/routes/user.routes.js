@@ -14,7 +14,7 @@ router.post('/',
     check('password', 'El password debe ser mínimo de 6 caracteres').isLength({ min: 6 }),
     veryfySignup.checkDuplicateUserNameOrEmail,
     authJwt.verifyToken, 
-    authJwt.isSuperAdmin
+    authJwt.isSuperAdminOrAdmin
   ],
   userController.createUser)
   router.get('/',[authJwt.verifyToken, authJwt.isAdmin], userController.getUsers)
