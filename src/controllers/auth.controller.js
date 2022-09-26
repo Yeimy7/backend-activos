@@ -55,3 +55,61 @@ export const profile = async (req, res) => {
     res.status(500).json({ msg: 'Hubo un error al encontrar su perfil' })
   }
 }
+
+export const updateData = async (req, res) => {
+  const { telefono, email, adicional } = req.body
+  try {
+    const persona = await Person.findByPk(req.userId)
+    const usuario = await User.findOne({ where: { id_persona: req.userId }, attributes: { exclude: ['password'] } })
+
+    if (!persona || !usuario) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' })
+    }
+    if (telefono) {
+      persona.telefono = telefono
+    }
+    if (email) {
+      usuario.email = email
+    }
+    if (adicional) {
+      usuario.adicional = adicional
+    }
+    if (email || adicional) {
+      await usuario.save()
+    }
+    if (telefono) {
+      await persona.save()
+    }
+    const user = { ...{ persona }, usuario }
+    res.status(200).json({ user })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: 'Error en el servidor' })
+  }
+}
+
+export const updatePassword = async (req, res) => {
+  const { password, newPassword } = req.body
+  try {
+    // Revisar que sea un usuario registrado
+    let usuario = await User.findOne({ where: { id_persona: req.userId } })
+    if (!usuario) {
+      return res.status(400).json({ msg: 'El usuario no existe' })
+    }
+
+    // Revisar el password
+    const passCorrecto = await bcryptjs.compare(password, usuario.password)
+    if (!passCorrecto) {
+      return res.status(500).json({ msg: 'La contraseña actual es incorrecta' })
+    }
+
+    const salt = await bcryptjs.genSalt(10)
+    const newPass = await bcryptjs.hash(newPassword, salt)
+    usuario.password = newPass
+    await usuario.save()
+    res.status(200).json({ categoria: 'success', msg: 'Contraseña actualizada exitosamente' })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: 'Error en el servidor' })
+  }
+}
