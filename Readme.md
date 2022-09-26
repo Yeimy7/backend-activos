@@ -16,4 +16,7 @@ import { Op } from 'sequelize'
     //   return res.status(400).json({ msg: 'El usuario ya existe' })
     // }
 
+Para formatear de path a url 
+    // const imageProfile = req.file.path.replace(/\\/g, "/")
+    // const avatar = './' + imageProfile
 </code></pre>

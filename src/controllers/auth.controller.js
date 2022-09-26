@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken'
 import bcryptjs from 'bcryptjs'
 import { WORD_SECRET } from '../config/config'
 import { validationResult } from 'express-validator'
+import path from 'path'
+import fs from 'fs-extra'
 
 export const signin = async (req, res) => {
   // Revisar si hay errores
@@ -110,6 +112,30 @@ export const updatePassword = async (req, res) => {
     res.status(200).json({ categoria: 'success', msg: 'Contraseña actualizada exitosamente' })
   } catch (error) {
     console.log(error);
+    res.status(500).json({ msg: 'Error en el servidor' })
+  }
+}
+
+
+export const updateImageProfile = async (req, res) => {
+
+  try {
+    // Revisar que sea un usuario registrado
+    let usuario = await User.findOne({ where: { id_persona: req.userId } })
+    if (!usuario) {
+      return res.status(400).json({ msg: 'El usuario no existe' })
+    }
+
+    if(usuario.avatar){
+      await fs.unlink(path.resolve(usuario.avatar))
+    }
+    console.log(req.file)
+    usuario.avatar = req.file.path
+    await usuario.save()
+    res.status(200).json({ categoria: 'success', msg: 'Imagen actualizada exitosamente' })
+  } catch (error) {
+
+    console.log('-------> ',error);
     res.status(500).json({ msg: 'Error en el servidor' })
   }
 }
