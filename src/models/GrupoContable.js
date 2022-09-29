@@ -7,7 +7,7 @@ const GrupoContable = conexion.define('grupo_contable', {
     primaryKey: true,
     defaultValue: Sequelize.UUIDV4
   },
-  descripcion: {
+  descripcion_g: {
     type: Sequelize.STRING,
     allowNull: false,
   },

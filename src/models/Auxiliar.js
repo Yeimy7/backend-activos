@@ -7,7 +7,7 @@ const Auxiliar = conexion.define('auxiliar', {
     primaryKey: true,
     defaultValue: Sequelize.UUIDV4
   },
-  descripcion: {
+  descripcion_aux: {
     type: Sequelize.STRING,
     allowNull: false,
   }
