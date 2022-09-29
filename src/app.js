@@ -1,9 +1,10 @@
 import express from 'express'
-import { createAuxiliar, createGrupoContable, createRoles } from './utils/initialSetup'
+import { crearArea, createAuxiliar, createGrupoContable, createRoles } from './utils/initialSetup'
 const app = express()
 createRoles()
 createGrupoContable()
 createAuxiliar()
+crearArea()
 import cors from 'cors'
 import assetsRoutes from './routes/assets.routes'
 import authRoutes from './routes/auth.routes'
