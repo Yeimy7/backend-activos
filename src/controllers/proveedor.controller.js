@@ -17,7 +17,7 @@ export const crearProveedor = async (req, res) => {
 
 export const obtenerProveedores = async (_req, res) => {
   try {
-    const proveedores = await Proveedor.findAll()
+    const proveedores = await Proveedor.findAll({ where: { estado: 'A' } })
     res.status(200).json(proveedores)
   } catch (error) {
     res.status(500).send('Hubo un error')
@@ -39,18 +39,25 @@ export const actualizarProveedorPorId = async (req, res) => {
   try {
     // Revisar el ID
     let proveedor = await Proveedor.findByPk(req.params.proveedorId)
-
+    let isModified = false
     // Si el proyecto existe o no
     if (!proveedor) {
       return res.status(404).json({ msg: 'Proovedor no encontrado' })
     }
-    if (encargado) {
+    if (encargado && encargado !== proveedor.encargado) {
       proveedor.encargado = encargado
+      isModified = true
     }
-    if (telefono) {
+    if (telefono && telefono !== proveedor.telefono) {
       proveedor.telefono = telefono
+      isModified = true
     }
-    const proveedorActualizado = await proveedor.save()
+    let proveedorActualizado
+    if (isModified) {
+      proveedorActualizado = await proveedor.save()
+    } else {
+      proveedorActualizado = proveedor
+    }
     res.status(200).json(proveedorActualizado)
   } catch (error) {
     res.status(500).send('Error en el servidor')
