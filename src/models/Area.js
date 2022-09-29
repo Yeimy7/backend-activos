@@ -14,7 +14,12 @@ const Area = conexion.define('area', {
     },
     codigo_area: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false
+    },
+    estado: {
+        type: Sequelize.STRING,
+        defaultValue: 'A',
+        allowNull: false
     }
 }, {
     freezeTableName: true,

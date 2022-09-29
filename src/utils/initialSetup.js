@@ -213,23 +213,3 @@ export const createAuxiliar = async () => {
     logger.error(error)
   }
 }
-
-export const crearArea = async () => {
-  await Area.estimated
-  try {
-    const [count] = await conectarDB.query(`SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = 'activos') AND (TABLE_NAME = 'area')`, { type: QueryTypes.SELECT });
-    if (Object.values(count)[0] > 0) return
-
-    await Promise.all([
-      new Area({ nombre_area: 'Administrativa', codigo_area: 'ADM' }).save(),
-      new Area({ nombre_area: 'Educativa', codigo_area: 'EDU' }).save(),
-      new Area({ nombre_area: 'Medica', codigo_area: 'MED' }).save(),
-      new Area({ nombre_area: 'Social', codigo_area: 'SOC' }).save(),
-      new Area({ nombre_area: 'Servicios', codigo_area: 'SER' }).save(),
-      new Area({ nombre_area: 'Areas comunes', codigo_area: 'ACM' }).save(),
-    ])
-    console.log('Tabla Area creada')
-  } catch (error) {
-    logger.error(error)
-  }
-}
