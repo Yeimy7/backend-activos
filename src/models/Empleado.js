@@ -8,7 +8,7 @@ const Empleado = conexion.define('empleado', {
     primaryKey: true,
   },
   fecha_incorporacion: {
-    type: Sequelize.DATE,
+    type: Sequelize.DATEONLY,
     allowNull: true,
   },
   estado: {

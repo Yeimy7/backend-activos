@@ -1,6 +1,6 @@
 import Person from '../models/Person'
 import User from '../models/User'
-import Role from '../models/Role'
+import Area from '../models/Area'
 import { validationResult } from 'express-validator'
 import Cargo from '../models/Cargo'
 import Empleado from '../models/Empleado'
@@ -24,7 +24,8 @@ export const crearEmpleado = async (req, res) => {
     }
 
     //Guardar el usuario
-    const cargo = await Cargo.findOne({ where: { descripcion_cargo: descripcion_cargo } })
+    const cargo = await Cargo.findOne({ raw: true, where: { descripcion_cargo: descripcion_cargo }, include: Area })
+    console.log(cargo)
     const newEmpleado = {
       id_persona: idPersona,
       fecha_incorporacion,
@@ -32,7 +33,7 @@ export const crearEmpleado = async (req, res) => {
     }
     await Empleado.create(newEmpleado)
 
-    res.status(201).json({ id_persona: idPersona, nombres, apellidos, ci, fecha_incorporacion, "cargo.descripcion_cargo": descripcion_cargo })
+    res.status(201).json({ id_persona: idPersona, nombres, apellidos, ci, fecha_incorporacion, "cargo.descripcion_cargo": descripcion_cargo, "cargo.area.nombre_area": cargo['area.nombre_area'] })
   } catch (error) {
     console.log(error);
     res.status(400).json({ msg: 'Hubo un error al intentar registrar al empleado' })
@@ -40,7 +41,7 @@ export const crearEmpleado = async (req, res) => {
 }
 export const obtenerEmpleados = async (_req, res) => {
   try {
-    const empleados = await Empleado.findAll({ raw: true, where: { estado: 'A' }, attributes: { exclude: ['id_cargo'] }, include: Cargo })
+    const empleados = await Empleado.findAll({ raw: true, where: { estado: 'A' }, attributes: { exclude: ['id_cargo'] }, include: { model: Cargo, include: { model: Area } } })
     const datosEmpleados = await Promise.all(empleados.map(async empleado => {
       const persona = await Person.findOne({ raw: true, where: { id_persona: empleado.id_persona } })
       return await { ...persona, ...empleado }
@@ -55,7 +56,7 @@ export const obtenerEmpleados = async (_req, res) => {
 export const obtenerEmpleadoPorId = async (req, res) => {
   try {
     const persona = await Person.findOne({ raw: true, where: { id_persona: req.params.empleadoId } })
-    const empleado = await Empleado.findOne({ raw: true, where: { id_persona: persona.id_persona }, attributes: { exclude: ['id_cargo'] }, include: Cargo })
+    const empleado = await Empleado.findOne({ raw: true, where: { id_persona: persona.id_persona }, attributes: { exclude: ['id_cargo'] }, include: { model: Cargo, include: { model: Area } } })
     const datosEmpleado = await { ...persona, ...empleado }
     res.status(200).json(datosEmpleado)
   } catch (error) {
@@ -68,7 +69,7 @@ export const actualizarEmpleadoPorId = async (req, res) => {
   const { fecha_incorporacion, descripcion_cargo } = req.body
   try {
     // Revisar el ID
-    const empleado = await Empleado.findByPk(req.params.empleadoId, { include: Cargo })
+    const empleado = await Empleado.findByPk(req.params.empleadoId, { include: { model: Cargo, include: { model: Area } } })
     let isModified = false
     // Si el proyecto existe o no
     if (!empleado) {
@@ -89,7 +90,7 @@ export const actualizarEmpleadoPorId = async (req, res) => {
     let empleadoActualizado
     if (isModified) {
       const newEmpleado = await empleado.save()
-      empleadoActualizado = await Empleado.findOne({ raw: true, where: { id_persona: newEmpleado.id_persona }, attributes: { exclude: ['id_cargo'] }, include: Cargo })
+      empleadoActualizado = await Empleado.findOne({ raw: true, where: { id_persona: newEmpleado.id_persona }, attributes: { exclude: ['id_cargo'] }, include: { model: Cargo, include: { model: Area } } })
     } else {
       empleadoActualizado = empleado
     }
