@@ -11,6 +11,7 @@ import userRoutes from './routes/user.routes'
 import proveedorRoutes from './routes/proveedor.routes'
 import areaRoutes from './routes/area.routes'
 import cargoRoutes from './routes/cargo.routes'
+import empleadoRoutes from './routes/empleado.routes'
 import path from 'path'
 import * as middleware from './utils/middleware'
 import morgan from 'morgan'
@@ -25,6 +26,7 @@ app.use('/api/users', userRoutes)
 app.use('/api/proveedores', proveedorRoutes)
 app.use('/api/areas', areaRoutes)
 app.use('/api/cargos', cargoRoutes)
+app.use('/api/empleados', empleadoRoutes)
 // Folder will be used to store public files
 app.use('/uploads', express.static(path.resolve('uploads')))
 app.use(morgan('dev'))

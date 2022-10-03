@@ -1,0 +1,32 @@
+import * as Sequelize from 'sequelize'
+import conexion from '../config/db'
+import Cargo from './Cargo'
+
+const Empleado = conexion.define('empleado', {
+  id_persona: {
+    type: Sequelize.UUID,
+    primaryKey: true,
+  },
+  fecha_incorporacion: {
+    type: Sequelize.DATE,
+    allowNull: true,
+  },
+  estado: {
+    type: Sequelize.STRING,
+    defaultValue: 'A',
+    allowNull: false
+  },
+  id_cargo: {
+    type: Sequelize.UUID,
+    allowNull: false,
+  },
+}, {
+  freezeTableName: true,
+  timestamps: false,
+})
+
+Empleado.sync()
+
+Empleado.belongsTo(Cargo, { foreignKey: 'id_cargo' })
+
+export default Empleado
