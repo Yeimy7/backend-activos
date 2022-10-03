@@ -4,9 +4,9 @@ import conectarDB from '../config/db'
 import Role from '../models/Role'
 import GrupoContable from '../models/GrupoContable'
 import Auxiliar from '../models/Auxiliar'
-import Area from '../models/Area'
 import Edificio from '../models/Edificio'
 import Piso from '../models/Piso'
+import Ambiente from '../models/Ambiente'
 
 export const createRoles = async () => {
   await Role.estimated
@@ -69,6 +69,49 @@ export const createPiso = async () => {
       new Piso({ codigo_piso: 'M5', id_edificio: hosp.id_edificio }).save(),
     ])
     console.log('Tabla Piso creada')
+  } catch (error) {
+    logger.error(error)
+  }
+}
+
+export const createAmbiente = async () => {
+  await Ambiente.estimated
+  try {
+    const [count] = await conectarDB.query(`SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = 'activos') AND (TABLE_NAME = 'ambiente')`, { type: QueryTypes.SELECT });
+    if (Object.values(count)[0] > 0) return
+    const a1 = await Piso.findOne({ raw: true, where: { codigo_piso: 'A1' } })
+    const a2 = await Piso.findOne({ raw: true, where: { codigo_piso: 'A2' } })
+    const a3 = await Piso.findOne({ raw: true, where: { codigo_piso: 'A3' } })
+
+    const c1 = await Piso.findOne({ raw: true, where: { codigo_piso: 'C1' } })
+    const c2 = await Piso.findOne({ raw: true, where: { codigo_piso: 'C2' } })
+    const c3 = await Piso.findOne({ raw: true, where: { codigo_piso: 'C3' } })
+
+    const m1 = await Piso.findOne({ raw: true, where: { codigo_piso: 'M1' } })
+    const m2 = await Piso.findOne({ raw: true, where: { codigo_piso: 'M2' } })
+    const m3 = await Piso.findOne({ raw: true, where: { codigo_piso: 'M3' } })
+
+
+
+    await Promise.all([
+      new Ambiente({ codigo_ambiente: 'O1-1', tipo_ambiente: 'oficina', id_piso: a1.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'O2-1', tipo_ambiente: 'oficina', id_piso: a1.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'O1-2', tipo_ambiente: 'oficina', id_piso: a2.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'O1-3', tipo_ambiente: 'oficina', id_piso: a3.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'O2-3', tipo_ambiente: 'oficina', id_piso: a3.id_piso }).save(),
+
+      new Ambiente({ codigo_ambiente: 'C1-1', tipo_ambiente: 'aula educativa', id_piso: c1.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'C1-2', tipo_ambiente: 'aula educativa', id_piso: c2.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'C2-2', tipo_ambiente: 'aula educativa', id_piso: c2.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'C1-3', tipo_ambiente: 'aula educativa', id_piso: c3.id_piso }).save(),
+
+      new Ambiente({ codigo_ambiente: 'M1-3', tipo_ambiente: 'consultorio medico', id_piso: m3.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'M2-3', tipo_ambiente: 'consultorio medico', id_piso: m3.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'M1-2', tipo_ambiente: 'consultorio medico', id_piso: m2.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'M2-2', tipo_ambiente: 'consultorio medico', id_piso: m2.id_piso }).save(),
+      new Ambiente({ codigo_ambiente: 'M1-1', tipo_ambiente: 'consultorio medico', id_piso: m1.id_piso }).save(),
+    ])
+    console.log('Tabla Ambiente creada')
   } catch (error) {
     logger.error(error)
   }
