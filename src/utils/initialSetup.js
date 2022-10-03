@@ -5,6 +5,7 @@ import Role from '../models/Role'
 import GrupoContable from '../models/GrupoContable'
 import Auxiliar from '../models/Auxiliar'
 import Area from '../models/Area'
+import Edificio from '../models/Edificio'
 
 export const createRoles = async () => {
   await Role.estimated
@@ -18,6 +19,23 @@ export const createRoles = async () => {
       new Role({ nombre_rol: 'Usuario' }).save()
     ])
     console.log('Tabla Rol creada')
+  } catch (error) {
+    logger.error(error)
+  }
+}
+
+export const createEdificio = async () => {
+  await Edificio.estimated
+  try {
+    const [count] = await conectarDB.query(`SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = 'activos') AND (TABLE_NAME = 'edificio')`, { type: QueryTypes.SELECT });
+    if (Object.values(count)[0] > 0) return
+
+    await Promise.all([
+      new Edificio({ nombre_edificio: 'Administracion' }).save(),
+      new Edificio({ nombre_edificio: 'Centro Educativo' }).save(),
+      new Edificio({ nombre_edificio: 'Hospital' }).save()
+    ])
+    console.log('Tabla Edificio creada')
   } catch (error) {
     logger.error(error)
   }
