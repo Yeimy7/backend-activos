@@ -6,6 +6,7 @@ import GrupoContable from '../models/GrupoContable'
 import Auxiliar from '../models/Auxiliar'
 import Area from '../models/Area'
 import Edificio from '../models/Edificio'
+import Piso from '../models/Piso'
 
 export const createRoles = async () => {
   await Role.estimated
@@ -36,6 +37,38 @@ export const createEdificio = async () => {
       new Edificio({ nombre_edificio: 'Hospital' }).save()
     ])
     console.log('Tabla Edificio creada')
+  } catch (error) {
+    logger.error(error)
+  }
+}
+
+export const createPiso = async () => {
+  await Piso.estimated
+  try {
+    const [count] = await conectarDB.query(`SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = 'activos') AND (TABLE_NAME = 'piso')`, { type: QueryTypes.SELECT });
+    if (Object.values(count)[0] > 0) return
+    const adm = await Edificio.findOne({ raw: true, where: { nombre_edificio: 'Administracion' } })
+    const cedu = await Edificio.findOne({ raw: true, where: { nombre_edificio: 'Centro Educativo' } })
+    const hosp = await Edificio.findOne({ raw: true, where: { nombre_edificio: 'Hospital' } })
+    await Promise.all([
+      new Piso({ codigo_piso: 'A1', id_edificio: adm.id_edificio }).save(),
+      new Piso({ codigo_piso: 'A2', id_edificio: adm.id_edificio }).save(),
+      new Piso({ codigo_piso: 'A3', id_edificio: adm.id_edificio }).save(),
+      new Piso({ codigo_piso: 'A4', id_edificio: adm.id_edificio }).save(),
+      new Piso({ codigo_piso: 'A5', id_edificio: adm.id_edificio }).save(),
+
+      new Piso({ codigo_piso: 'C1', id_edificio: cedu.id_edificio }).save(),
+      new Piso({ codigo_piso: 'C2', id_edificio: cedu.id_edificio }).save(),
+      new Piso({ codigo_piso: 'C3', id_edificio: cedu.id_edificio }).save(),
+      new Piso({ codigo_piso: 'C4', id_edificio: cedu.id_edificio }).save(),
+
+      new Piso({ codigo_piso: 'M1', id_edificio: hosp.id_edificio }).save(),
+      new Piso({ codigo_piso: 'M2', id_edificio: hosp.id_edificio }).save(),
+      new Piso({ codigo_piso: 'M3', id_edificio: hosp.id_edificio }).save(),
+      new Piso({ codigo_piso: 'M4', id_edificio: hosp.id_edificio }).save(),
+      new Piso({ codigo_piso: 'M5', id_edificio: hosp.id_edificio }).save(),
+    ])
+    console.log('Tabla Piso creada')
   } catch (error) {
     logger.error(error)
   }
