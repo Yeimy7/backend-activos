@@ -40,6 +40,7 @@ const Activo = conexion.define('activo', {
   },
   fecha_asig_ambiente: {
     type: Sequelize.DATEONLY,
+    defaultValue: Sequelize.NOW,
     allowNull: true,
   },
   fecha_asig_empleado: {
