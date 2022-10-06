@@ -1,0 +1,17 @@
+import { Router } from 'express'
+const router = Router()
+import * as activoController from '../controllers/activo.controller'
+import { authJwt } from '../middlewares'
+import { check } from 'express-validator'
+
+router.put('/',
+  [
+    check('id_activo', 'El id activo es obligatorio').not().isEmpty(),
+    check('id_persona', 'El id empleado es obligatorio').not().isEmpty(),
+    authJwt.verifyToken,
+    authJwt.isSuperAdminOrAdmin
+  ], activoController.asignarActivo)
+router.get('/', [authJwt.verifyToken], activoController.activosAsignados)
+router.get('/no', [authJwt.verifyToken], activoController.activosNoAsignados)
+
+export default router

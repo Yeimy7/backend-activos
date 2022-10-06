@@ -7,6 +7,9 @@ import Proveedor from '../models/Proveedor'
 
 import path from 'path'
 import fs from 'fs-extra'
+import Empleado from '../models/Empleado'
+import Person from '../models/Person'
+import { Op } from 'sequelize'
 
 export const crearActivo = async (req, res) => {
   // Revisar si hay errores
@@ -180,5 +183,72 @@ export const actualizarImagenActivoPorId = async (req, res) => {
   } catch (error) {
     console.log('-------> ', error);
     res.status(500).json({ msg: 'Error en el servidor' })
+  }
+}
+
+export const asignarActivo = async (req, res) => {
+  const errores = validationResult(req)
+  if (!errores.isEmpty()) {
+    return res.status(400).json({ errores: errores.array() })
+  }
+  const { id_activo, id_persona } = req.body
+  try {
+    // Revisar el ID
+    let activo = await Activo.findByPk(id_activo)
+    if (!activo) {
+      return res.status(404).json({ msg: 'Activo no encontrado' })
+    }
+    let empleado = await Empleado.findByPk(id_persona)
+    if (!empleado) {
+      return res.status(404).json({ msg: 'Empleado no encontrado' })
+    }
+    const date = new Date()
+    const today = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+
+    activo.fecha_asig_empleado = today
+    activo.id_persona = empleado.id_persona
+
+    const activoAsignado = await activo.save()
+
+    res.status(200).json(activoAsignado)
+  } catch (error) {
+    res.status(500).send('Error en el servidor')
+  }
+}
+
+export const activosAsignados = async (req, res) => {
+  try {
+    const activos = await Activo.findAll({
+      raw: true, where: {
+        estado: 'A', [Op.and]: [
+          { id_persona: { [Op.not]: null } },
+          { id_persona: { [Op.not]: '' } }
+        ]
+      }
+    })
+    const allDataActivos = await Promise.all(activos.map(async activo => {
+      const person = await Person.findOne({ raw: true, where: { id_persona: activo.id_persona } })
+      return await { ...person, ...activo }
+    }))
+    res.status(200).json(allDataActivos)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
+  }
+}
+export const activosNoAsignados = async (req, res) => {
+  try {
+    const activos = await Activo.findAll({
+      raw: true, where: {
+        estado: 'A', [Op.or]: [
+          { id_persona: { [Op.eq]: null } },
+          { id_persona: { [Op.eq]: '' } }
+        ]
+      }
+    })
+    res.status(200).json(activos)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
   }
 }
