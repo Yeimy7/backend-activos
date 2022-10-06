@@ -3,7 +3,7 @@
 import * as Sequelize from 'sequelize'
 import conexion from '../config/db'
 
-const Asset = conexion.define('activo', {
+const Asset = conexion.define('asset', {
     id_activo: {
         type: Sequelize.UUID,
         primaryKey: true,

@@ -124,19 +124,19 @@ export const createGrupoContable = async () => {
     if (Object.values(count)[0] > 0) return
 
     await Promise.all([
-      new GrupoContable({ descripcion: 'Muebles y enseres de oficina', vida_util: 10, coeficiente: 10 }).save(),
-      new GrupoContable({ descripcion: 'Maquinaria en general', vida_util: 8, coeficiente: 12.5 }).save(),
-      new GrupoContable({ descripcion: 'Equipos e instalaciones', vida_util: 8, coeficiente: 12.5 }).save(),
-      new GrupoContable({ descripcion: 'Vehículos automotores', vida_util: 5, coeficiente: 20 }).save(),
-      new GrupoContable({ descripcion: 'Maquinaria para la construcción', vida_util: 5, coeficiente: 20 }).save(),
-      new GrupoContable({ descripcion: 'Maquinaria agrícola', vida_util: 4, coeficiente: 25 }).save(),
-      new GrupoContable({ descripcion: 'Herramientas en general', vida_util: 4, coeficiente: 25 }).save(),
-      new GrupoContable({ descripcion: 'Equipos de computación', vida_util: 4, coeficiente: 25 }).save(),
-      new GrupoContable({ descripcion: 'Alambrados, tranqueras y vallas', vida_util: 10, coeficiente: 10 }).save(),
-      new GrupoContable({ descripcion: 'Viviendas para el personal', vida_util: 20, coeficiente: 5 }).save(),
-      new GrupoContable({ descripcion: 'Muebles y enseres en las viviendas para el personal', vida_util: 10, coeficiente: 10 }).save(),
-      new GrupoContable({ descripcion: 'Tinglados y cobertizos de madera', vida_util: 5, coeficiente: 20 }).save(),
-      new GrupoContable({ descripcion: 'Tinglados y cobertizos de metal', vida_util: 10, coeficiente: 10 }).save(),
+      new GrupoContable({ descripcion_g: 'Muebles y enseres de oficina', vida_util: 10, coeficiente: 10 }).save(),
+      new GrupoContable({ descripcion_g: 'Maquinaria en general', vida_util: 8, coeficiente: 12.5 }).save(),
+      new GrupoContable({ descripcion_g: 'Equipos e instalaciones', vida_util: 8, coeficiente: 12.5 }).save(),
+      new GrupoContable({ descripcion_g: 'Vehículos automotores', vida_util: 5, coeficiente: 20 }).save(),
+      new GrupoContable({ descripcion_g: 'Maquinaria para la construcción', vida_util: 5, coeficiente: 20 }).save(),
+      new GrupoContable({ descripcion_g: 'Maquinaria agrícola', vida_util: 4, coeficiente: 25 }).save(),
+      new GrupoContable({ descripcion_g: 'Herramientas en general', vida_util: 4, coeficiente: 25 }).save(),
+      new GrupoContable({ descripcion_g: 'Equipos de computación', vida_util: 4, coeficiente: 25 }).save(),
+      new GrupoContable({ descripcion_g: 'Alambrados, tranqueras y vallas', vida_util: 10, coeficiente: 10 }).save(),
+      new GrupoContable({ descripcion_g: 'Viviendas para el personal', vida_util: 20, coeficiente: 5 }).save(),
+      new GrupoContable({ descripcion_g: 'Muebles y enseres en las viviendas para el personal', vida_util: 10, coeficiente: 10 }).save(),
+      new GrupoContable({ descripcion_g: 'Tinglados y cobertizos de madera', vida_util: 5, coeficiente: 20 }).save(),
+      new GrupoContable({ descripcion_g: 'Tinglados y cobertizos de metal', vida_util: 10, coeficiente: 10 }).save(),
     ])
     console.log('Tabla grupo_contable creada')
   } catch (error) {
