@@ -13,5 +13,6 @@ router.put('/',
   ], activoController.asignarActivo)
 router.get('/', [authJwt.verifyToken], activoController.activosAsignados)
 router.get('/no', [authJwt.verifyToken], activoController.activosNoAsignados)
+router.put('/desvincular', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], activoController.desvincularActivo)
 
 export default router

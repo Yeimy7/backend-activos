@@ -252,3 +252,23 @@ export const activosNoAsignados = async (req, res) => {
     res.status(500).send('Hubo un error')
   }
 }
+
+export const desvincularActivo = async (req, res) => {
+  const { id_activo } = req.body
+  try {
+    // Revisar el ID
+    let activo = await Activo.findByPk(id_activo)
+    if (!activo) {
+      return res.status(404).json({ msg: 'Activo no encontrado' })
+    }
+
+    activo.fecha_asig_empleado = null
+    activo.id_persona = null
+
+    const activoAsignado = await activo.save()
+
+    res.status(200).json(activoAsignado)
+  } catch (error) {
+    res.status(500).send('Error en el servidor')
+  }
+}
