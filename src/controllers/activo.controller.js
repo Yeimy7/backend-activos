@@ -203,15 +203,21 @@ export const asignarActivo = async (req, res) => {
       return res.status(404).json({ msg: 'Empleado no encontrado' })
     }
     const date = new Date()
-    const today = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
 
-    activo.fecha_asig_empleado = today
+    activo.fecha_asig_empleado = date
     activo.id_persona = empleado.id_persona
 
-    const activoAsignado = await activo.save()
+    const activoAsignado = await activo.save({ raw: true })
+    const person = await Person.findOne({ raw: true, where: { id_persona: id_persona } })
 
-    res.status(200).json(activoAsignado)
+    res.status(200).json(
+      {
+        ...activoAsignado.dataValues,
+        ...person
+      }
+    )
   } catch (error) {
+    console.log('------>', error)
     res.status(500).send('Error en el servidor')
   }
 }
@@ -248,7 +254,7 @@ export const activosNoAsignados = async (req, res) => {
     })
     res.status(200).json(activos)
   } catch (error) {
-    console.log(error)
+    console.log('-------->', error)
     res.status(500).send('Hubo un error')
   }
 }
