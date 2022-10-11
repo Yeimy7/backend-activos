@@ -119,7 +119,7 @@ export const obtenerActivoPorId = async (req, res) => {
 
 export const actualizarActivoPorId = async (req, res) => {
   // Extraer la información del proyecto
-  const { fecha_ingreso, descripcion_activo } = req.body
+  const { fecha_ingreso, codigo_activo,descripcion_activo } = req.body
   try {
     // Revisar el ID
     let activo = await Activo.findByPk(req.params.activoId)
@@ -130,6 +130,10 @@ export const actualizarActivoPorId = async (req, res) => {
     }
     if (fecha_ingreso && fecha_ingreso !== activo.fecha_ingreso) {
       activo.fecha_ingreso = fecha_ingreso
+      isModified = true
+    }
+    if (codigo_activo && codigo_activo !== activo.codigo_activo) {
+      activo.codigo_activo = codigo_activo
       isModified = true
     }
     if (descripcion_activo && descripcion_activo !== activo.descripcion_activo) {

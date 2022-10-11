@@ -24,8 +24,8 @@ router.post('/',
 
 router.get('/', [authJwt.verifyToken], activoController.obtenerActivos)
 router.get('/:activoId', [authJwt.verifyToken], activoController.obtenerActivoPorId)
-router.put('/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], activoController.actualizarActivoPorId)
-router.put('/img/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin,multer.single('img_activo')], activoController.actualizarImagenActivoPorId)
+router.put('/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin, veryfyAssetCode.checkDuplicateAssetCode], activoController.actualizarActivoPorId)
+router.put('/img/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin, multer.single('img_activo')], activoController.actualizarImagenActivoPorId)
 router.put('/down/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], activoController.bajaActivoPorId)
 
 export default router
