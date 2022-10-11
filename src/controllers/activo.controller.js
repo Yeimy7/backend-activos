@@ -278,3 +278,38 @@ export const desvincularActivo = async (req, res) => {
     res.status(500).send('Error en el servidor')
   }
 }
+
+export const trasladarActivo = async (req, res) => {
+  const errores = validationResult(req)
+  if (!errores.isEmpty()) {
+    return res.status(400).json({ errores: errores.array() })
+  }
+  const { id_activo, id_ambiente } = req.body
+  try {
+    // Revisar el ID
+    let activo = await Activo.findByPk(id_activo)
+    if (!activo) {
+      return res.status(404).json({ msg: 'Activo no encontrado' })
+    }
+    let ambiente = await Ambiente.findByPk(id_ambiente)
+    if (!ambiente) {
+      return res.status(404).json({ msg: 'Ambiente no encontrado' })
+    }
+    const date = new Date()
+
+    activo.fecha_asig_ambiente = date
+    activo.id_ambiente = ambiente.id_ambiente
+
+    const activoTrasladado = await activo.save()
+
+    res.status(200).json(
+      {
+        ...activoTrasladado.dataValues,
+        ...ambiente.dataValues
+      }
+    )
+  } catch (error) {
+    console.log('------>', error)
+    res.status(500).send('Error en el servidor')
+  }
+}
