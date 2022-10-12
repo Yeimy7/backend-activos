@@ -73,7 +73,7 @@ export const obtenerActivos = async (_req, res) => {
           },
           {
             model: GrupoContable,
-            attributes: ['descripcion_g']
+            attributes: ['descripcion_g', 'coeficiente', 'vida_util']
           },
           {
             model: Proveedor,
