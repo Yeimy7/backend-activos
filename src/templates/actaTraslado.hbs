@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acta de traslado de activo fijo</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <style>
+    header,
+    footer {
+      background-color: #559ba1;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    h5 {
+      font-size: 18px;
+    }
+
+    .text {
+      text-align: justify;
+    }
+
+    .firmas {
+      margin-block: 100px;
+    }
+
+    .linea {
+      border-top: 1px dotted #8f8f8f;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="row p-3 text-white m-3">
+    <div class="col">
+      <p class="lh-sm">
+        <span class="d-block">Zona Los Andes - Calle Balboa</span>
+        <span class="d-block">El Alto - Bolivia</span>
+      </p>
+      <p>Fecha: El Alto <span id="fecha"></span></p>
+    </div>
+    <div id="logo" class="col text-center">
+      <img src="http://localhost:3000/logo.jpg" width="100" height="100" />
+    </div>
+    <div class="col text-right">
+      <h5>Asociación Centro Virgen Niña - EPDB</h5>
+      <p class="lh-sm">
+        <span class="d-block">Teléfono: (591-2) 2841126</span>
+        <span class="d-block">Email: virgenninaepdb@gmail.com</span>
+      </p>
+    </div>
+  </header>
+  <h1 class="text-center my-4">ACTA DE TRASLADO DE ACTIVO FIJO</h1>
+  <div class="container">
+    <section class="container">
+      <p class="text lh-sm">
+        En la ciudad de El Alto en fecha se procede al traslado del bien
+        de acuerdo al siguiente detalle:
+      </p>
+      <div class="row justify-content-md-center my-5">
+        <div class="col-4">
+          <p class="lh-sm">
+            <strong class="d-block">Código:</strong>
+            <strong class="d-block">Descripción:</strong>
+            <strong class="d-block">Ambiente de origen:</strong>
+            <strong class="d-block">Responsable:</strong>
+            <strong class="d-block">Ambiente nuevo:</strong>
+            <strong class="d-block">Motivo:</strong>
+          </p>
+        </div>
+        <div class="col-4">
+          <p class="lh-sm">
+            <span class="d-block">{{data.codigo_activo}}</span>
+            <span class="d-block">{{data.descripcion_activo}}</span>
+            <span class="d-block">{{data.ambiente_origen}}</span>
+            <span class="d-block">{{data.responsable}}</span>
+            <span class="d-block">{{data.ambiente_nuevo}}</span>
+            <span class="d-block">{{data.motivo}}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <p class="text lh-sm">
+        En señal de conformidad y aceptación se firma la presente acta.
+      </p>
+    </section>
+    <section class="firmas">
+      <div class="row justify-content-md-center text-center">
+        <div class="col-4 mr-4">
+          <p class="lh-sm linea">
+            <span class="d-block">{{data.responsable}}</span>
+            <span class="d-block">{{data.cargo_responsable}}</span>
+          </p>
+        </div>
+        <div class="col-4 ml-4">
+          <p class="lh-sm linea">
+            <span class="d-block">{{data.encargado}}</span>
+            <span class="d-block">{{data.cargo_encargado}}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    let today = new Date();
+    let month = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    document.getElementById("fecha").innerHTML += `${today.getDate()} de ${month[today.getMonth()]} de ${today.getFullYear()}`;
+  </script>
+</body>
+
+</html>

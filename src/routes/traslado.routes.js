@@ -16,6 +16,7 @@ router.post('/',
   ],
   trasladoController.crearTraslado)
 
+router.post('/pdf', [authJwt.verifyToken], trasladoController.actaTrasladoActivo)
 router.get('/', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], trasladoController.obtenerTraslados)
 router.get('/:trasladoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], trasladoController.obtenerTrasladoPorId)
 export default router

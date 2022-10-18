@@ -3,6 +3,11 @@ import Devolucion from '../models/Devolucion'
 import Activo from '../models/Activo'
 import Empleado from '../models/Empleado'
 import { validationResult } from 'express-validator'
+import Cargo from '../models/Cargo'
+import Ambiente from '../models/Ambiente'
+import Auxiliar from '../models/Auxiliar'
+import GrupoContable from '../models/GrupoContable'
+import { crearPDF } from '../utils/generarPDF'
 
 export const crearDevolucion = async (req, res) => {
   // Revisar si hay errores
@@ -77,6 +82,60 @@ export const obtenerDevolucionPorId = async (req, res) => {
     const datosDevolucion = await { 'empleado.nombres': persona.nombres, 'empleado.apellidos': persona.apellidos, ...devolucion }
     res.status(200).json(datosDevolucion)
   } catch (error) {
+    res.status(500).send('Hubo un error')
+  }
+}
+
+export const actaDevolucionActivo = async (req, res) => {
+  //Buscar cargo jefe de unidad de activos fijos 
+  const { id_devolucion } = req.body
+  try {
+    const devolucion = await Devolucion.findOne({ raw: true, where: { id_devolucion } })
+    const activo = await Activo.findOne({
+      raw: true, where: { id_activo: devolucion.id_activo }, include:
+        [
+          {
+            model: Ambiente,
+            attributes: ['codigo_ambiente', 'tipo_ambiente']
+          },
+          {
+            model: Auxiliar,
+            attributes: ['descripcion_aux']
+          },
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+          }
+        ]
+    })
+    const empleado = await Empleado.findOne({
+      raw: true, where: { id_persona: devolucion.id_persona }, include: [{
+        model: Cargo,
+        attributes: ['descripcion_cargo']
+      },]
+    })
+    const persona = await Person.findOne({ raw: true, where: { id_persona: devolucion.id_persona } })
+    const cargo = await Cargo.findOne({ raw: true, where: { descripcion_cargo: 'Jefe de unidad de activos fijos' } })
+    const encargado = await Empleado.findOne({ raw: true, where: { id_cargo: cargo.id_cargo } })
+    const personaEncargado = await Person.findOne({ raw: true, where: { id_persona: encargado.id_persona } })
+    const datosActivo = {
+      oficina: activo['ambiente.tipo_ambiente'] + ' ' + activo['ambiente.codigo_ambiente'],
+      responsable: persona.nombres + ' ' + persona.apellidos,
+      grupo_contable: activo['grupo_contable.descripcion_g'],
+      auxiliar: activo['auxiliar.descripcion_aux'],
+      codigo_activo: activo.codigo_activo,
+      fecha_ingreso: activo.fecha_ingreso,
+      descripcion_activo: activo.descripcion_activo,
+      motivo: devolucion.motivo_devolucion,
+      cargo_responsable: empleado['cargo.descripcion_cargo'],
+      encargado: personaEncargado.nombres + ' ' + personaEncargado.apellidos,
+      cargo_encargado: cargo.descripcion_cargo
+    }
+    const pdf = await crearPDF('actaDevolucion', datosActivo)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+  } catch (error) {
+    console.log(error)
     res.status(500).send('Hubo un error')
   }
 }

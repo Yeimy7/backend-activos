@@ -16,6 +16,7 @@ router.post('/',
   ],
   devolucionController.crearDevolucion)
 
+router.post('/pdf', [authJwt.verifyToken], devolucionController.actaDevolucionActivo)
 router.get('/', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], devolucionController.obtenerDevoluciones)
 router.get('/:devolucionId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], devolucionController.obtenerDevolucionPorId)
 export default router

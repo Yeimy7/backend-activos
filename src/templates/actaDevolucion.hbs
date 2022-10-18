@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acta de devolución</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <style>
+    header,
+    footer {
+      background-color: #559ba1;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    h5 {
+      font-size: 18px;
+    }
+
+    .text {
+      text-align: justify;
+    }
+
+    .firmas {
+      margin-block: 100px;
+    }
+
+    .linea {
+      border-top: 1px dotted #8f8f8f;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="row p-3 text-white m-3">
+    <div class="col">
+      <p class="lh-sm">
+        <span class="d-block">Zona Los Andes - Calle Balboa</span>
+        <span class="d-block">El Alto - Bolivia</span>
+      </p>
+      <p>Fecha: El Alto <span id="fecha"></span></p>
+    </div>
+    <div id="logo" class="col text-center">
+      <img src="http://localhost:3000/logo.jpg" width="100" height="100" />
+    </div>
+    <div class="col text-right">
+      <h5>Asociación Centro Virgen Niña - EPDB</h5>
+      <p class="lh-sm">
+        <span class="d-block">Teléfono: (591-2) 2841126</span>
+        <span class="d-block">Email: virgenninaepdb@gmail.com</span>
+      </p>
+    </div>
+  </header>
+  <div class="container">
+    <section class="container">
+      <h1 class="text-center my-4">ACTA DE DEVOLUCIÓN DE ACTIVO FIJO</h1>
+      <div class="row justify-content-md-center my-5">
+        <div class="col-4">
+          <p class="lh-sm">
+            <strong class="d-block">Oficina:</strong>
+            <strong class="d-block">Responsable:</strong>
+            <strong class="d-block">Rubro contable:</strong>
+            <strong class="d-block">Tipo de bien:</strong>
+          </p>
+        </div>
+        <div class="col-4">
+          <p class="lh-sm">
+            <span class="d-block">{{data.oficina}}</span>
+            <span class="d-block">{{data.responsable}}</span>
+            <span class="d-block">{{data.grupo_contable}}</span>
+            <span class="d-block">{{data.auxiliar}}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <p class="text lh-sm">
+        En la ciudad de El Alto en fecha se procede a la devolución del bien
+        de acuerdo al siguiente detalle:
+      </p>
+      <div class="row text-center my-4">
+        <div class="col">
+          <strong class="d-block">Código</strong>
+          <span class="d-block">{{data.codigo_activo}}</span>
+        </div>
+        <div class="col">
+          <strong class="d-block">Incorporación</strong>
+          <span class="d-block">{{data.fecha_ingreso}}</span>
+        </div>
+        <div class="col">
+          <strong class="d-block">Descripción</strong>
+          <span class="d-block">{{data.descripcion_activo}}</span>
+        </div>
+        <div class="col">
+          <strong class="d-block">Motivo</strong>
+          <span class="d-block">{{data.motivo}}</span>
+        </div>
+      </div>
+      <p class="text lh-sm">
+        Para ser liberado de la responsabilidad, el funcionario deberá
+        devolver a la unidad responsable de activos fijos, el o los bienes que
+        estaban a su cargo, debiendo recabar la conformidad escrita de esta
+        unidad o responsable. Mientras no lo haga, estará sujeto al régimen de
+        responsabilidad establecida en la ley N° 1178 y sus reglamentos.
+      </p>
+      <p class="text lh-sm">
+        En señal de conformidad y aceptación se firma la presente acta.
+      </p>
+    </section>
+    <section class="firmas">
+      <div class="row justify-content-md-center text-center">
+        <div class="col-4 mr-4">
+          <p class="lh-sm linea">
+            <span class="d-block">{{data.responsable}}</span>
+            <span class="d-block">{{data.cargo_responsable}}</span>
+          </p>
+        </div>
+        <div class="col-4 ml-4">
+          <p class="lh-sm linea">
+            <span class="d-block">{{data.encargado}}</span>
+            <span class="d-block">{{data.cargo_encargado}}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    let today = new Date();
+    let month = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    document.getElementById("fecha").innerHTML += `${today.getDate()} de ${month[today.getMonth()]} de ${today.getFullYear()}`;
+  </script>
+</body>
+
+</html>

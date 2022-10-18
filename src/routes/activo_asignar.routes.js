@@ -14,5 +14,5 @@ router.put('/',
 router.get('/', [authJwt.verifyToken], activoController.activosAsignados)
 router.get('/no', [authJwt.verifyToken], activoController.activosNoAsignados)
 router.put('/desvincular', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], activoController.desvincularActivo)
-
+router.post('/pdf', [authJwt.verifyToken], activoController.actaAsignacionActivo)
 export default router

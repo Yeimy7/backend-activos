@@ -2,6 +2,10 @@ import Traslado from '../models/Traslado'
 import Activo from '../models/Activo'
 import { validationResult } from 'express-validator'
 import Ambiente from '../models/Ambiente'
+import Empleado from '../models/Empleado'
+import Cargo from '../models/Cargo'
+import Person from '../models/Person'
+import { crearPDF } from '../utils/generarPDF'
 
 export const crearTraslado = async (req, res) => {
   // Revisar si hay errores
@@ -77,9 +81,66 @@ export const obtenerTrasladoPorId = async (req, res) => {
         },
       ]
     })
-    
+
     res.status(200).json(traslado)
   } catch (error) {
+    res.status(500).send('Hubo un error')
+  }
+}
+
+export const actaTrasladoActivo = async (req, res) => {
+  //Buscar cargo jefe de unidad de activos fijos 
+  const { id_traslado } = req.body
+  try {
+    const traslado = await Traslado.findOne({
+      raw: true, where: { id_traslado }, include: [
+        {
+          model: Ambiente,
+          attributes: ['codigo_ambiente', 'tipo_ambiente']
+        },
+        {
+          model: Activo,
+          attributes: ['codigo_activo', 'descripcion_activo'],
+          include: [
+            {
+              model: Ambiente,
+              attributes: ['codigo_ambiente', 'tipo_ambiente']
+            },
+            {
+              model: Empleado,
+              attributes: ['id_persona', 'id_cargo'],
+              include: [
+                {
+                  model: Cargo,
+                  attributes: ['descripcion_cargo']
+                }
+              ]
+            },
+          ]
+        }
+      ]
+    })
+
+    const persona = await Person.findOne({ raw: true, where: { id_persona: traslado['activo.empleado.id_persona'] } })
+    const cargo = await Cargo.findOne({ raw: true, where: { descripcion_cargo: 'Jefe de unidad de activos fijos' } })
+    const encargado = await Empleado.findOne({ raw: true, where: { id_cargo: cargo.id_cargo } })
+    const personaEncargado = await Person.findOne({ raw: true, where: { id_persona: encargado.id_persona } })
+    const datosActivo = {
+      codigo_activo: traslado['activo.codigo_activo'],
+      descripcion_activo: traslado['activo.descripcion_activo'],
+      ambiente_origen: traslado['ambiente.tipo_ambiente'] + ' ' + traslado['ambiente.codigo_ambiente'],
+      responsable: persona.nombres + ' ' + persona.apellidos,
+      cargo_responsable: traslado['activo.empleado.cargo.descripcion_cargo'],
+      ambiente_nuevo: traslado['activo.ambiente.tipo_ambiente'] + ' ' + traslado['activo.ambiente.codigo_ambiente'],
+      motivo: traslado.motivo_traslado,
+      encargado: personaEncargado.nombres + ' ' + personaEncargado.apellidos,
+      cargo_encargado: cargo.descripcion_cargo
+    }
+    const pdf = await crearPDF('actaTraslado', datosActivo)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+  } catch (error) {
+    console.log(error)
     res.status(500).send('Hubo un error')
   }
 }

@@ -10,6 +10,9 @@ import fs from 'fs-extra'
 import Empleado from '../models/Empleado'
 import Person from '../models/Person'
 import { Op } from 'sequelize'
+import { crearPDF } from '../utils/generarPDF'
+import { calculoDepreciacionActivoMes } from '../utils/calculoDepreciacion'
+import Cargo from '../models/Cargo'
 
 export const crearActivo = async (req, res) => {
   // Revisar si hay errores
@@ -119,7 +122,7 @@ export const obtenerActivoPorId = async (req, res) => {
 
 export const actualizarActivoPorId = async (req, res) => {
   // Extraer la información del proyecto
-  const { fecha_ingreso, codigo_activo,descripcion_activo } = req.body
+  const { fecha_ingreso, codigo_activo, descripcion_activo } = req.body
   try {
     // Revisar el ID
     let activo = await Activo.findByPk(req.params.activoId)
@@ -315,5 +318,135 @@ export const trasladarActivo = async (req, res) => {
   } catch (error) {
     console.log('------>', error)
     res.status(500).send('Error en el servidor')
+  }
+}
+
+export const actaActivos = async (_req, res) => {
+  try {
+    const activos = await Activo.findAll({
+      raw: true, where: { estado: 'A' }, include:
+        [
+          {
+            model: Ambiente,
+            attributes: ['codigo_ambiente', 'tipo_ambiente']
+          }
+        ]
+    })
+    const itemsActivos = activos.map(activo => {
+      return {
+        ...activo,
+        codigo_ambiente: activo['ambiente.codigo_ambiente'],
+        tipo_ambiente: activo['ambiente.tipo_ambiente'],
+      }
+    })
+    const pdf = await crearPDF('listaActivos', itemsActivos)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
+  }
+}
+
+export const actaDepreciacionActivos = async (req, res) => {
+  const { mes, anio } = req.body
+  try {
+    const activos = await Activo.findAll({
+      raw: true, where: { estado: 'A' }, include:
+        [
+          {
+            model: Ambiente,
+            attributes: ['codigo_ambiente', 'tipo_ambiente']
+          },
+          {
+            model: Auxiliar,
+            attributes: ['descripcion_aux']
+          },
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+          }
+        ]
+    })
+
+    const itemsActivos = (activos.map(activo => {
+      const valor_actual = calculoDepreciacionActivoMes(
+        {
+          costo: activo.costo,
+          coeficiente: activo['grupo_contable.coeficiente'],
+          vida_util: activo['grupo_contable.vida_util'],
+          fecha_ingreso: activo.fecha_ingreso,
+          mes: mes,
+          anio: anio
+        })
+      return {
+        ...activo,
+        grupo_contable: activo['grupo_contable.descripcion_g'],
+        valor_actual: valor_actual
+      }
+    }))
+    const pdf = await crearPDF('depreciacionActivos', itemsActivos)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
+  }
+}
+
+export const actaAsignacionActivo = async (req, res) => {
+  //Buscar cargo jefe de unidad de activos fijos 
+  const { id_activo } = req.body
+  try {
+    const activo = await Activo.findOne({
+      raw: true, where: { id_activo }, include:
+        [
+          {
+            model: Ambiente,
+            attributes: ['codigo_ambiente', 'tipo_ambiente']
+          },
+          {
+            model: Auxiliar,
+            attributes: ['descripcion_aux']
+          },
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+          },
+          {
+            model: Empleado,
+            attributes: ['id_persona', 'id_cargo'],
+            include: {
+              model: Cargo,
+              attributes: ['descripcion_cargo']
+            }
+          }
+        ]
+    })
+    // const empleado = await Empleado.findOne({ raw: true, where: { id_persona } })
+    const persona = await Person.findOne({ raw: true, where: { id_persona: activo['empleado.id_persona'] } })
+    // const cargoEmpleado = await Cargo.findOne({ raw: true, where: { id_cargo: empleado.id_cargo } })
+    const cargo = await Cargo.findOne({ raw: true, where: { descripcion_cargo: 'Jefe de unidad de activos fijos' } })
+    const encargado = await Empleado.findOne({ raw: true, where: { id_cargo: cargo.id_cargo } })
+    const personaEncargado = await Person.findOne({ raw: true, where: { id_persona: encargado.id_persona } })
+    const datosActivo = {
+      oficina: activo['ambiente.tipo_ambiente'] + ' ' + activo['ambiente.codigo_ambiente'],
+      responsable: persona.nombres + ' ' + persona.apellidos,
+      grupo_contable: activo['grupo_contable.descripcion_g'],
+      auxiliar: activo['auxiliar.descripcion_aux'],
+      codigo_activo: activo.codigo_activo,
+      fecha_ingreso: activo.fecha_ingreso,
+      descripcion_activo: activo.descripcion_activo,
+      cargo_responsable: activo['empleado.cargo.descripcion_cargo'],
+      encargado: personaEncargado.nombres + ' ' + personaEncargado.apellidos,
+      cargo_encargado: cargo.descripcion_cargo
+    }
+    const pdf = await crearPDF('actaAsignacion', datosActivo)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
   }
 }

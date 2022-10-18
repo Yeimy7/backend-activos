@@ -21,7 +21,8 @@ router.post('/',
     authJwt.isSuperAdminOrAdmin
   ],
   activoController.crearActivo)
-
+router.post('/pdf', [authJwt.verifyToken], activoController.actaActivos)
+router.post('/depreciacion/pdf', [authJwt.verifyToken], activoController.actaDepreciacionActivos)
 router.get('/', [authJwt.verifyToken], activoController.obtenerActivos)
 router.get('/:activoId', [authJwt.verifyToken], activoController.obtenerActivoPorId)
 router.put('/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin, veryfyAssetCode.checkDuplicateAssetCode], activoController.actualizarActivoPorId)
