@@ -424,9 +424,7 @@ export const actaAsignacionActivo = async (req, res) => {
           }
         ]
     })
-    // const empleado = await Empleado.findOne({ raw: true, where: { id_persona } })
     const persona = await Person.findOne({ raw: true, where: { id_persona: activo['empleado.id_persona'] } })
-    // const cargoEmpleado = await Cargo.findOne({ raw: true, where: { id_cargo: empleado.id_cargo } })
     const cargo = await Cargo.findOne({ raw: true, where: { descripcion_cargo: 'Jefe de unidad de activos fijos' } })
     const encargado = await Empleado.findOne({ raw: true, where: { id_cargo: cargo.id_cargo } })
     const personaEncargado = await Person.findOne({ raw: true, where: { id_persona: encargado.id_persona } })
@@ -443,6 +441,20 @@ export const actaAsignacionActivo = async (req, res) => {
       cargo_encargado: cargo.descripcion_cargo
     }
     const pdf = await crearPDF('actaAsignacion', datosActivo)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
+  }
+}
+
+export const codigosActivos = async (_req, res) => {
+  try {
+    const activos = await Activo.findAll({
+      raw: true, where: { estado: 'A' }, attributes: ['codigo_activo']
+    })
+    const pdf = await crearPDF('listaCodigoActivo', activos)
     res.contentType('application/pdf');
     res.status(200).send(pdf)
   } catch (error) {

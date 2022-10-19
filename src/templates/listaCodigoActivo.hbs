@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de activos</title>
+  <script src="http://localhost:3000/JsBarcode.all.min.js"></script>
+</head>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+<style>
+  header,
+  footer {
+    background-color: #559ba1;
+  }
+
+  h5 {
+    font-size: 18px;
+  }
+
+  h1 {
+    font-size: 28px;
+    margin-block: 50px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
+
+  h4 {
+    font-size: 16px;
+  }
+
+  .firmas {
+    margin-block: 100px;
+  }
+
+  .linea {
+    border-top: 1px dotted #8f8f8f;
+  }
+
+  .box {
+    border-bottom: 3px solid black;
+  }
+</style>
+</head>
+
+<body>
+  <header class="row p-3 text-white m-3">
+    <div class="col">
+      <p class="lh-sm">
+        <span class="d-block">Zona Los Andes - Calle Balboa</span>
+        <span class="d-block">El Alto - Bolivia</span>
+      </p>
+      <p>Fecha: El Alto <span id="fecha"></span></p>
+    </div>
+    <div id="logo" class="col text-center">
+      <img src="http://localhost:3000/logo.jpg" width="100" height="100" />
+    </div>
+    <div class="col text-right">
+      <h5>Asociación Centro Virgen Niña - EPDB</h5>
+      <p class="lh-sm">
+        <span class="d-block">Teléfono: (591-2) 2841126</span>
+        <span class="d-block">Email: virgenninaepdb@gmail.com</span>
+      </p>
+    </div>
+  </header>
+  <h1 class="text-center">CÓDIGOS DE BARRA DE ACTIVOS FIJOS</h1>
+  <div class="container">
+    {{#each data as | activo |}}
+    <div class="row align-items-center">
+      <div class="row p-4 box align-items-center ">
+        <div class="col-md-auto">
+          <svg class="barcode" jsbarcode-format="CODE128" jsbarcode-value={{activo.codigo_activo}}
+            jsbarcode-textmargin="0" jsbarcode-fontoptions="bold">
+          </svg>
+          <script>
+            JsBarcode(".barcode").init();
+          </script>
+        </div>
+        <div class="col-md-auto">
+          <img src="http://localhost:3000/logo.jpg" width="120" />
+        </div>
+      </div>
+    </div>
+    {{/each}}
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+      let today = new Date();
+      let month = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+      document.getElementById("fecha").innerHTML += `${today.getDate()} de ${month[today.getMonth()]} de ${today.getFullYear()}`;
+    </script>
+</body>
+
+</html>
