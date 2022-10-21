@@ -26,6 +26,7 @@ router.post('/depreciacion/pdf', [authJwt.verifyToken], activoController.actaDep
 router.post('/codigos/pdf', [authJwt.verifyToken], activoController.codigosActivos)
 router.get('/', [authJwt.verifyToken], activoController.obtenerActivos)
 router.get('/:activoId', [authJwt.verifyToken], activoController.obtenerActivoPorId)
+router.get('/codigo/:codigoActivo', [authJwt.verifyToken], activoController.obtenerActivoPorCodigo)
 router.put('/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin, veryfyAssetCode.checkDuplicateAssetCode], activoController.actualizarActivoPorId)
 router.put('/img/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin, multer.single('img_activo')], activoController.actualizarImagenActivoPorId)
 router.put('/down/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], activoController.bajaActivoPorId)

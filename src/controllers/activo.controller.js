@@ -13,6 +13,9 @@ import { Op } from 'sequelize'
 import { crearPDF } from '../utils/generarPDF'
 import { calculoDepreciacionActivoMes } from '../utils/calculoDepreciacion'
 import Cargo from '../models/Cargo'
+import Piso from '../models/Piso'
+import Edificio from '../models/Edificio'
+import Area from '../models/Area'
 
 export const crearActivo = async (req, res) => {
   // Revisar si hay errores
@@ -113,6 +116,72 @@ export const obtenerActivoPorId = async (req, res) => {
         }
       ]
     })
+    res.status(200).json(activo)
+  } catch (error) {
+    console.log('---->', error)
+    res.status(500).send('Hubo un error')
+  }
+}
+
+export const obtenerActivoPorCodigo = async (req, res) => {
+  try {
+    let activo = await Activo.findOne({
+      raw: true, where: { codigo_activo: req.params.codigoActivo }, attributes:
+        [
+          'codigo_activo', 'fecha_ingreso', 'descripcion_activo', 'img_activo', 'estado'
+        ]
+      , include: [
+        {
+          model: Ambiente,
+          attributes: ['codigo_ambiente', 'tipo_ambiente'],
+          include: [
+            {
+              model: Piso,
+              attributes: ['codigo_piso'],
+              include: [
+                {
+                  model: Edificio,
+                  attributes: ['nombre_edificio']
+                },
+              ]
+            },
+          ]
+        },
+        {
+          model: Auxiliar,
+          attributes: ['descripcion_aux']
+        },
+        {
+          model: Proveedor,
+          attributes: ['razon_social']
+        },
+        {
+          model: Empleado,
+          attributes: ['id_persona'],
+          include: [
+            {
+              model: Cargo,
+              attributes: ['descripcion_cargo'],
+              include: [
+                {
+                  model: Area,
+                  attributes: ['nombre_area', 'codigo_area']
+                },
+              ]
+            },
+          ]
+        }
+      ]
+    })
+    if (activo) {
+      let datosPersona = null
+      if (activo['empleado.id_persona']) {
+        const persona = await Person.findByPk(activo['empleado.id_persona'])
+        datosPersona = `${persona.nombres} ${persona.apellidos}`
+      }
+      activo = { ...activo, empleado: datosPersona }
+    }
+
     res.status(200).json(activo)
   } catch (error) {
     console.log('---->', error)
