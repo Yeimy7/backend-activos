@@ -58,22 +58,12 @@
   <div class="container">
     <section class="container">
       <h1 class="text-center my-4">ACTA DE ASIGNACIÓN DE ACTIVO FIJO</h1>
-      <div class="row justify-content-md-center my-5">
-        <div class="col-4">
-          <p class="lh-sm">
-            <strong class="d-block">Oficina:</strong>
-            <strong class="d-block">Responsable:</strong>
-            <strong class="d-block">Rubro contable:</strong>
-            <strong class="d-block">Tipo de bien:</strong>
-          </p>
-        </div>
-        <div class="col-4">
-          <p class="lh-sm">
-            <span class="d-block">{{data.oficina}}</span>
-            <span class="d-block">{{data.responsable}}</span>
-            <span class="d-block">{{data.grupo_contable}}</span>
-            <span class="d-block">{{data.auxiliar}}</span>
-          </p>
+      <div class="row justify-content-md-left my-5">
+        <div class="col-6">
+            <span class="d-block"><strong>Custodio: </strong>{{data.responsable}}</span>
+            <span class="d-block"><strong>Tipo de bien: </strong>{{data.auxiliar}}</span>
+            <span class="d-block"><strong>Oficina: </strong>{{data.oficina}}</span>
+            <span class="d-block"><strong>Rubro contable: </strong>{{data.grupo_contable}}</span>
         </div>
       </div>
     </section>
@@ -109,12 +99,11 @@
         a su persona. Asímismo, el funcionario que ahora tiene a su cargo
         dichos bienes, por ningún concepto podrá prestarlos o transferirlos
         por cuenta propia, en tal caso la institución asumirá acciones de
-        acuerdo a ley, efectuando las denuncias civiles y/o penales que
-        correspondan.
+        acuerdo a reglamento interno emitiendo las sanciones correspondientes.
       </p>
       <p>
-        Para efectos de determinar al custodio responsable, en conformidad
-        firma el presente acta:
+        Para efectos de asignación al custodio responsable firman en 
+        conformidad la presente acta:
       </p>
     </section>
     <section class="firmas">

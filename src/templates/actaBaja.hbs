@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Acta de traslado de activo fijo</title>
+  <title>Acta de asignación</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
   <style>
     header,
@@ -55,47 +55,55 @@
       </p>
     </div>
   </header>
-  <h1 class="text-center my-4">ACTA DE TRASLADO DE ACTIVO FIJO</h1>
   <div class="container">
     <section class="container">
-      <p class="text lh-sm">
-        En la ciudad de El Alto en fecha se procede al traslado del bien
-        de acuerdo al siguiente detalle:
-      </p>
-      <div class="row justify-content-md-left my-5">
-        <div class="col-6">
-          <span class="d-block"> <strong>Código: </strong>{{data.codigo_activo}} </span>
-          <span class="d-block"> <strong>Descripción: </strong>{{data.descripcion_activo}} </span>
-          <span class="d-block"> <strong>Ambiente de origen: </strong>{{data.ambiente_origen}} </span>
-          <span class="d-block"> <strong>Custodio: </strong>{{data.responsable}} </span>
-          <span class="d-block"> <strong>Ambiente: </strong>{{data.ambiente_nuevo}} </span>
-          <span class="d-block"> <strong>Motivo: </strong>{{data.motivo}} </span>
-        </div>
-      </div>
+      <h1 class="text-center my-4">ACTA DE BAJA DE ACTIVO FIJO</h1>
     </section>
     <section>
       <p class="text lh-sm">
-        En señal de conformidad y aceptación se firma la presente acta.
+        En la ciudad de El Alto se procedió a dar de baja al activo
+        con el siguiente detalle:
       </p>
-    </section>
-    <section class="firmas">
-      <div class="row justify-content-md-center text-center">
-        <div class="col-4 mr-4">
-          <p class="lh-sm linea">
-            <span class="d-block">{{data.responsable}}</span>
-            <span class="d-block">{{data.cargo_responsable}}</span>
-          </p>
+      <div class="row text-center my-4">
+        <div class="col">
+          <strong class="d-block">Código</strong>
+          <span class="d-block">{{data.codigo_activo}}</span>
         </div>
-        <div class="col-4 ml-4">
-          <p class="lh-sm linea">
-            <span class="d-block">{{data.encargado}}</span>
-            <span class="d-block">{{data.cargo_encargado}}</span>
-          </p>
+        <div class="col">
+          <strong class="d-block">Incorporación</strong>
+          <span class="d-block">{{data.fecha_ingreso}}</span>
+        </div>
+        <div class="col">
+          <strong class="d-block">Fecha de Baja</strong>
+          <span class="d-block">{{data.fecha_baja}}</span>
+        </div>
+        <div class="col">
+          <strong class="d-block">Descripción</strong>
+          <span class="d-block">{{data.descripcion_activo}}</span>
+        </div>
+        <div class="col">
+          <strong class="d-block">Grupo contable</strong>
+          <span class="d-block">{{data.grupo_contable}}</span>
+        </div>
+        <div class="col">
+          <strong class="d-block">Motivo</strong>
+          <span class="d-block">{{data.motivo}}</span>
         </div>
       </div>
-    </section>
+      <p class="text lh-sm">
+        En constancia de conformidad, firmo al pie de la presente Acta de Baja de activo.
+      </p>
+      <section class="firmas">
+        <div class="row justify-content-md-center text-center">
+          <div class="col-4 ml-4">
+            <p class="lh-sm linea">
+              <span class="d-block">{{data.encargado}}</span>
+              <span class="d-block">{{data.cargo_encargado}}</span>
+            </p>
+          </div>
+        </div>
+      </section>
   </div>
-
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script>
     let today = new Date();

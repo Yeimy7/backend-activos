@@ -1,6 +1,13 @@
 import Baja from '../models/Baja'
+import Person from '../models/Person'
 import Activo from '../models/Activo'
+import Empleado from '../models/Empleado'
 import { validationResult } from 'express-validator'
+import Cargo from '../models/Cargo'
+import Ambiente from '../models/Ambiente'
+import Auxiliar from '../models/Auxiliar'
+import GrupoContable from '../models/GrupoContable'
+import { crearPDF } from '../utils/generarPDF'
 
 export const crearBaja = async (req, res) => {
   // Revisar si hay errores
@@ -59,6 +66,51 @@ export const obtenerBajaPorId = async (req, res) => {
     })
     res.status(200).json(baja)
   } catch (error) {
+    res.status(500).send('Hubo un error')
+  }
+}
+export const actaBajaActivo = async (req, res) => {
+  //Buscar cargo jefe de unidad de activos fijos 
+  const { id_baja } = req.body
+  try {
+    const baja = await Baja.findOne({ raw: true, where: { id_baja } })
+    const activo = await Activo.findOne({
+      raw: true, where: { id_activo: baja.id_activo }, include:
+        [
+          {
+            model: Ambiente,
+            attributes: ['codigo_ambiente', 'tipo_ambiente']
+          },
+          {
+            model: Auxiliar,
+            attributes: ['descripcion_aux']
+          },
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+          }
+        ]
+    })
+
+    const cargo = await Cargo.findOne({ raw: true, where: { descripcion_cargo: 'Jefe de unidad de activos fijos' } })
+    const encargado = await Empleado.findOne({ raw: true, where: { id_cargo: cargo.id_cargo } })
+    const personaEncargado = await Person.findOne({ raw: true, where: { id_persona: encargado.id_persona } })
+    const datosActivo = {
+      grupo_contable: activo['grupo_contable.descripcion_g'],
+      auxiliar: activo['auxiliar.descripcion_aux'],
+      codigo_activo: activo.codigo_activo,
+      fecha_ingreso: activo.fecha_ingreso,
+      fecha_baja: baja.fecha_baja,
+      descripcion_activo: activo.descripcion_activo,
+      motivo: baja.motivo_baja,
+      encargado: personaEncargado.nombres + ' ' + personaEncargado.apellidos,
+      cargo_encargado: cargo.descripcion_cargo
+    }
+    const pdf = await crearPDF('actaBaja', datosActivo)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+  } catch (error) {
+    console.log(error)
     res.status(500).send('Hubo un error')
   }
 }

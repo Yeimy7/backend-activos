@@ -13,7 +13,7 @@ router.post('/',
     authJwt.isSuperAdminOrAdmin
   ],
   bajaController.crearBaja)
-
+router.post('/pdf', [authJwt.verifyToken], bajaController.actaBajaActivo)
 router.get('/', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], bajaController.obtenerBajas)
 router.get('/:bajaId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], bajaController.obtenerBajaPorId)
 export default router

@@ -17,7 +17,7 @@ export const createUser = async (req, res) => {
     const registeredPerson = await Person.create({ ci, nombres, apellidos, telefono })
 
     //Guardar el usuario
-    const rol = await Role.findOne({ where: { nombre_rol: 'Usuario' } })
+    const rol = await Role.findOne({ where: { nombre_rol: 'Custodio' } })
     const newUser = {
       id_persona: registeredPerson.id_persona,
       email, password, adicional, avatar, id_rol: rol.id_rol,
