@@ -25,7 +25,7 @@ export const createUser = async (req, res) => {
     // newUser.id_rol = rol.id_rol
     await User.create(newUser)
 
-    res.status(201).json({ id_persona: registeredPerson.id_persona, nombres, apellidos, ci, telefono, email, adicional: null, avatar: null, "rol.nombre_rol": "Usuario" })
+    res.status(201).json({ id_persona: registeredPerson.id_persona, nombres, apellidos, ci, telefono, email, adicional: null, avatar: null, "rol.nombre_rol": "Custodio" })
   } catch (error) {
     console.log(error);
     res.status(400).json({ msg: 'Hubo un error al intentar registrar al usuario' })
@@ -78,7 +78,7 @@ export const descendUser = async (req, res) => {
     if (!user) return res.status(404).json({ msg: 'Usuario no encontrado' })
 
     // Buscar el rol Administrador
-    const rol = await Role.findOne({ where: { nombre_rol: 'Usuario' } })
+    const rol = await Role.findOne({ where: { nombre_rol: 'Custodio' } })
     user.id_rol = rol.id_rol
     // newUser.id_rol = rol.id_rol
     // console.log(user)

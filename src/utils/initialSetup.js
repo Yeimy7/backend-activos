@@ -17,7 +17,7 @@ export const createRoles = async () => {
     await Promise.all([
       new Role({ nombre_rol: 'Administrador' }).save(),
       new Role({ nombre_rol: 'Super-admin' }).save(),
-      new Role({ nombre_rol: 'Usuario' }).save()
+      new Role({ nombre_rol: 'Custodio' }).save()
     ])
     console.log('Tabla Rol creada')
   } catch (error) {
