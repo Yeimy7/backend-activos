@@ -1,12 +1,12 @@
 import express from 'express'
 import { createAmbiente, createAuxiliar, createEdificio, createGrupoContable, createPiso, createRoles } from './utils/initialSetup'
 const app = express()
-createRoles()
-createGrupoContable()
-createAuxiliar()
-createEdificio()
-createPiso()
-createAmbiente()
+// createRoles()
+// createGrupoContable()
+// createAuxiliar()
+// createEdificio()
+// createPiso()
+// createAmbiente()
 import cors from 'cors'
 import assetsRoutes from './routes/assets.routes'
 import authRoutes from './routes/auth.routes'
