@@ -1,24 +1,9 @@
-// const activo1 = {
-//   codigo: "1",
-//   valorInicial: 3700,
-//   depAcumulada: 1115.079962,
-//   valorResidual: 4460.31985,
-//   // indiceUfv: 1.90027,
-//   indiceUfv: 2.29076,
-
-// };
-
-// // const ufvActual = 2.29076;
-// const ufvActual = 2.33187;
-// const porcentajeDep = 25;
-// const { depAcumulada, valorResidual, indiceUfv: ufvAnterior } = activo1;
-
 
 function factorActualizacion(ufvActual, ufvAnterior) {
   return ufvActual / ufvAnterior;
 }
 
-function valorActualizado(factorActualizacion, valorRedisual) {
+function valorActualizado(factorActualizacion, valorResidual) {
   return valorResidual * factorActualizacion;
 }
 
@@ -51,13 +36,21 @@ export const depreciacion = async (valorResidual,
   const C = await factorActualizacion(ufvActual, ufvAnterior);
   const D = await valorActualizado(C, valorResidual);
   const E = await incrementoActualizacion(D, valorResidual);
-  const F = await depAcumulada;
-  const G = await incrementoDepAcumulada(depAcumulada, C);
+  const F = depAcumulada;
+  const G = await incrementoDepAcumulada(F, C);
   const H = await depPeriodo(D, porcentajeDep);
-  const I = await depAcumuladaActualizada(depAcumulada, G, H);
+  const I = await depAcumuladaActualizada(F, G, H);
   const J = await valorNeto(D, I);
   return {
-    B, C, D, E, F, G, H, I, J
+    B: B.toFixed(2),
+    C: C.toFixed(2),
+    D: D.toFixed(2),
+    E: E.toFixed(2),
+    F: F.toFixed(2),
+    G: G.toFixed(2),
+    H: H.toFixed(2),
+    I: I.toFixed(2),
+    J: J.toFixed(2)
   }
 
 }

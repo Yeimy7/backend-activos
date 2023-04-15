@@ -12,13 +12,13 @@ router.post('/',
     check('telefono', 'Agrega un numero de telefono válido').isNumeric().optional({ nullable: true }),
     check('email', 'Agrega un email válido').isEmail(),
     check('password', 'El password debe ser mínimo de 6 caracteres').isLength({ min: 6 }),
-    // veryfySignup.checkDuplicateUserNameOrEmail,
-    // authJwt.verifyToken, 
-    // authJwt.isSuperAdminOrAdmin
+    veryfySignup.checkDuplicateUserNameOrEmail,
+    authJwt.verifyToken, 
+    authJwt.isSuperAdminOrAdmin
   ],
   userController.createUser)
   router.get('/',
-  // [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin],
+  [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin],
    userController.getUsers)
   router.put('/up/:id', [ authJwt.verifyToken, authJwt.isSuperAdmin], userController.ascendUser)
   router.put('/down/:id', [ authJwt.verifyToken, authJwt.isSuperAdmin], userController.descendUser)

@@ -12,6 +12,9 @@ router.post('/',
     check('fecha_ingreso', 'La fecha de ingreso del activo es obligatoria').not().isEmpty(),
     check('descripcion_activo', 'La descripción del activo es obligatoria').not().isEmpty(),
     check('costo', 'El costo del activo es obligatorio').not().isEmpty().isFloat(),
+    check('dep_acumulada', 'La depreciacion acumulada es obligatoria').not().isEmpty().isFloat(),
+    check('valor_residual', 'El valor residual es obligatorio').not().isEmpty().isFloat(),
+    check('indice_ufv', 'El indice ufv es obligatorio').not().isEmpty().isFloat(),
     check('codigo_ambiente', 'El código del ambiente es obligatorio').not().isEmpty(),
     check('descripcion_aux', 'El tipo de auxiliar es obligatorio').not().isEmpty(),
     check('descripcion_g', 'El grupo contable es obligatorio').not().isEmpty(),
@@ -23,8 +26,10 @@ router.post('/',
   activoController.crearActivo)
 router.post('/pdf', [authJwt.verifyToken], activoController.actaActivos)
 router.post('/depreciacion/pdf', [authJwt.verifyToken], activoController.actaDepreciacionActivos)
+router.post('/depre/pdf', [authJwt.verifyToken], activoController.cuadroDepreciacionActivos);
 router.post('/codigos/pdf', [authJwt.verifyToken], activoController.codigosActivos)
 router.get('/', [authJwt.verifyToken], activoController.obtenerActivos)
+router.get('/total', [authJwt.verifyToken], activoController.totalActivos)
 router.get('/:activoId', [authJwt.verifyToken], activoController.obtenerActivoPorId)
 router.get('/codigo/:codigoActivo', [authJwt.verifyToken], activoController.obtenerActivoPorCodigo)
 router.get('/custodio/:idPersona', [authJwt.verifyToken], activoController.activosPorCustodio)

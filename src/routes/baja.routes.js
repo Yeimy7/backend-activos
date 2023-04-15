@@ -15,5 +15,6 @@ router.post('/',
   bajaController.crearBaja)
 router.post('/pdf', [authJwt.verifyToken], bajaController.actaBajaActivo)
 router.get('/', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], bajaController.obtenerBajas)
+router.get('/total', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], bajaController.totalBajas)
 router.get('/:bajaId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], bajaController.obtenerBajaPorId)
 export default router

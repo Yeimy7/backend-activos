@@ -29,6 +29,18 @@ const Activo = conexion.define('activo', {
     type: Sequelize.FLOAT,
     allowNull: false,
   },
+  dep_acumulada: {
+    type: Sequelize.FLOAT,
+    defaultValue: 0
+  },
+  valor_residual: {
+    type: Sequelize.FLOAT,
+    allowNull:false
+  },
+  indice_ufv: {
+    type: Sequelize.FLOAT,
+    allowNull: false,
+  },
   img_activo: {
     type: Sequelize.STRING,
     allowNull: true,

@@ -16,6 +16,7 @@ router.post('/',
   empleadoController.crearEmpleado)
 
 router.get('/', authJwt.verifyToken, empleadoController.obtenerEmpleados)
+router.get('/total', authJwt.verifyToken, empleadoController.totalEmpleados)
 router.get('/:empleadoId', authJwt.verifyToken, empleadoController.obtenerEmpleadoPorId)
 router.put('/:empleadoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], empleadoController.actualizarEmpleadoPorId)
 router.put('/down/:empleadoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], empleadoController.bajaEmpleadoPorId)

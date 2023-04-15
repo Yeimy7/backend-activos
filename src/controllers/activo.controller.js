@@ -16,6 +16,7 @@ import Cargo from '../models/Cargo'
 import Piso from '../models/Piso'
 import Edificio from '../models/Edificio'
 import Area from '../models/Area'
+import { depreciacion } from '../utils/cuadroDepreciacion'
 
 export const crearActivo = async (req, res) => {
   // Revisar si hay errores
@@ -23,7 +24,7 @@ export const crearActivo = async (req, res) => {
   if (!errores.isEmpty()) {
     return res.status(400).json({ errores: errores.array() })
   }
-  const { codigo_activo, fecha_ingreso, descripcion_activo, costo, img_activo, codigo_ambiente, descripcion_aux, descripcion_g, razon_social } = req.body
+  const { codigo_activo, fecha_ingreso, descripcion_activo, costo, dep_acumulada, valor_residual, indice_ufv, img_activo, codigo_ambiente, descripcion_aux, descripcion_g, razon_social } = req.body
   try {
     const ambiente = await Ambiente.findOne({ where: { codigo_ambiente: codigo_ambiente } })
     if (!ambiente) return res.status(404).json({ msg: 'Ambiente no encontrado' })
@@ -42,6 +43,9 @@ export const crearActivo = async (req, res) => {
       fecha_ingreso,
       descripcion_activo,
       costo,
+      dep_acumulada,
+      valor_residual,
+      indice_ufv,
       img_activo,
       id_ambiente: ambiente.id_ambiente,
       id_auxiliar: auxiliar.id_auxiliar,
@@ -463,6 +467,61 @@ export const actaDepreciacionActivos = async (req, res) => {
     res.status(500).send('Hubo un error')
   }
 }
+// ******************************************************
+export const cuadroDepreciacionActivos = async (req, res) => {
+  const { idGrupo, indice_actual } = req.body
+  try {
+    const activos = await Activo.findAll({
+      raw: true, where: {
+        estado: 'A',
+        id_grupo: idGrupo,
+        [Op.and]: [
+          { id_grupo: { [Op.not]: null } },
+          { id_grupo: { [Op.not]: '' } }
+        ],
+      },
+      include:
+        [
+          {
+            model: Auxiliar,
+            attributes: ['descripcion_aux']
+          },
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+          },
+          {
+            model: Proveedor,
+            attributes: ['razon_social']
+          },
+
+        ]
+    })
+
+    const itemsActivos = await Promise.all(activos.map(async activo => {
+      const { valor_residual: vr, dep_acumulada: da, indice_ufv: iu } = activo
+      const valores = await depreciacion(vr, da, iu, indice_actual, activo['grupo_contable.coeficiente'])
+      const { B, C, D, E, F, G, H, I, J } = valores;
+      return await {
+        ...activo,
+        grupo_contable: activo['grupo_contable.descripcion_g'],
+        auxiliar: activo['descripcion_aux'], 
+        B, C, D, E, F, G, H, I, J
+      }
+    }))
+
+    console.log(itemsActivos)
+    // res.status(201);
+    const pdf = await crearPDF('cuadroDepreciacion', itemsActivos)
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
+  }
+}
+// ****************************************************
 
 export const actaAsignacionActivo = async (req, res) => {
   //Buscar cargo jefe de unidad de activos fijos 
@@ -535,7 +594,7 @@ export const codigosActivos = async (_req, res) => {
 export const activosPorCustodio = async (req, res) => {
   try {
     const person = await Person.findOne({ raw: true, where: { id_persona: req.params.idPersona } })
-    
+
     const activos = await Activo.findAll({
       raw: true, where: {
         estado: 'A',
@@ -586,7 +645,7 @@ export const activosPorCustodio = async (req, res) => {
 export const activosPorGrupo = async (req, res) => {
   try {
     const grupoContable = await GrupoContable.findOne({ raw: true, where: { id_grupo: req.params.idGrupo } })
-    
+
     const activos = await Activo.findAll({
       raw: true, where: {
         estado: 'A',
@@ -638,7 +697,7 @@ export const activosPorGrupo = async (req, res) => {
 export const activosPorEntidad = async (req, res) => {
   try {
     const entidad = await Proveedor.findOne({ raw: true, where: { id_proveedor: req.params.idEntidad } })
-    
+
     const activos = await Activo.findAll({
       raw: true, where: {
         estado: 'A',
@@ -687,3 +746,35 @@ export const activosPorEntidad = async (req, res) => {
   }
 }
 
+export const totalAsignados = async (_req, res) => {
+  try {
+    const totalActivos = await Activo.count({
+      where: {
+        estado: 'A', [Op.and]: [
+          { id_persona: { [Op.not]: null } },
+          { id_persona: { [Op.not]: '' } }
+        ]
+      }
+    })
+    res.status(200).json(totalActivos)
+  } catch (error) {
+    console.log(error)
+    // res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'No se pudo encontrar el total' })
+  }
+}
+
+export const totalActivos = async (_req, res) => {
+  try {
+    const totalActivos = await Activo.count({
+      where: {
+        estado: 'A', 
+      }
+    })
+    res.status(200).json(totalActivos)
+  } catch (error) {
+    console.log(error)
+    // res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'No se pudo encontrar el total' })
+  }
+}

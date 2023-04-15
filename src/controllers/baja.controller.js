@@ -114,3 +114,12 @@ export const actaBajaActivo = async (req, res) => {
     res.status(500).send('Hubo un error')
   }
 }
+
+export const totalBajas = async (_req, res) => {
+  try {
+    const totalBajas = await Baja.count()
+    res.status(200).json(totalBajas)
+  } catch (error) {
+    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los bajas' })
+  }
+}

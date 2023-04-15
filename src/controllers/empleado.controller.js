@@ -60,7 +60,7 @@ export const obtenerEmpleadoPorId = async (req, res) => {
     const datosEmpleado = await { ...persona, ...empleado }
     res.status(200).json(datosEmpleado)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).send('Hubo un errorr')
   }
 }
 
@@ -114,5 +114,15 @@ export const bajaEmpleadoPorId = async (req, res) => {
   } catch (error) {
     console.log(error)
     res.status(500).send('Error en el servidor')
+  }
+}
+export const totalEmpleados = async (_req, res) => {
+  try {
+    const totalEmpleados = await Empleado.count({
+      where: { estado: 'A' }
+    });
+    res.status(200).json(totalEmpleados)
+  } catch (error) {
+    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los empleados' })
   }
 }

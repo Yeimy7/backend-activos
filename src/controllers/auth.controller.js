@@ -33,7 +33,7 @@ export const signin = async (req, res) => {
 
     // Token
     jwt.sign({ id: usuario.id_persona }, WORD_SECRET, {
-      expiresIn: 3600 //1 hora
+      expiresIn: 21600 //6 horas
     }, (error, token) => {
       if (error) throw error
       // Mensaje de confirmacion
