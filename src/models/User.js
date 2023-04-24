@@ -37,6 +37,10 @@ const User = conexion.define('usuario', {
     type: Sequelize.UUID,
     allowNull: false,
   },
+  reset_token: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 }, {
   freezeTableName: true,
   timestamps: false,

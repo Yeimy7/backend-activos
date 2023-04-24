@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de activos</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Josefin Sans', sans-serif;
+      }
+      body{
+        border: 1px solid black;
+      }
+      .navbar {
+        background-color: #000000;
+        padding: 1rem;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+      }
+      .nav-email {
+        /* padding: 2rem; */
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 1rem;
+        gap: 2rem;
+        font-weight: bolder;
+        font-size: 18px;
+      }
+      .nav-email img {
+        background-color: white;
+        border-radius: 50%;
+        padding: 0.2rem;
+      }
+      .button {
+        background-color: #1bbc9b;
+        padding: 1rem;
+        color: white;
+        font-weight: 700;
+        border-radius: 10px;
+        text-decoration: none;
+      }
+      .contain {
+        padding: 2rem;
+        font-weight: 600;
+        font-size: 16px;
+        text-align: center;
+      }
+      .contain p{
+        display: block;
+        position: relative;
+        margin: 30px 0;
+      }
+      .contain a {
+        text-align: center;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="nav-email">
+       
+        <p>Asociación Centro Virgen Niña - EPDB</p>
+      </div>
+    </div>
+    <div class="contain">
+      <p>Hola!</p>
+      <p>
+        Alguien solicitó el cambio de password de tu cuenta. Puedes hacerlo:
+      </p>
+      <a href={{link}} class="button">Haciendo click aquí</a>
+    </div>
+  </body>
+</html>

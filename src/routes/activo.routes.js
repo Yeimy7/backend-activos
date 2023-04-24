@@ -31,7 +31,7 @@ router.post('/codigos/pdf', [authJwt.verifyToken], activoController.codigosActiv
 router.get('/', [authJwt.verifyToken], activoController.obtenerActivos)
 router.get('/total', [authJwt.verifyToken], activoController.totalActivos)
 router.get('/:activoId', [authJwt.verifyToken], activoController.obtenerActivoPorId)
-router.get('/codigo/:codigoActivo', [authJwt.verifyToken], activoController.obtenerActivoPorCodigo)
+router.get('/codigo/:codigoActivo', activoController.obtenerActivoPorCodigo)
 router.get('/custodio/:idPersona', [authJwt.verifyToken], activoController.activosPorCustodio)
 router.get('/grupo/:idGrupo', [authJwt.verifyToken], activoController.activosPorGrupo)
 router.get('/entidad/:idEntidad', [authJwt.verifyToken], activoController.activosPorEntidad)

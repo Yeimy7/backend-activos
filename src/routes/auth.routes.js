@@ -7,6 +7,10 @@ import multer from '../utils/multer'
 
 router.post('/signin', authController.signin)
 router.get('/profile', [authJwt.verifyToken], authController.profile)
+
+router.put('/forgot-password', authController.forgotPassword);
+router.put('/new-password', authController.createNewPassword);
+
 router.put('/profile', [authJwt.verifyToken], authController.updateData)
 router.put('/profile/pwd', [authJwt.verifyToken], authController.updatePassword)
 router.put('/profile/img', [authJwt.verifyToken, multer.single('image')], authController.updateImageProfile)
