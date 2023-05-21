@@ -24,6 +24,7 @@ import devolucionRoutes from './routes/devolucion.routes'
 import bajaRoutes from './routes/baja.routes'
 import trasladoRoutes from './routes/traslado.routes'
 import trasladarRoutes from './routes/activo_traslado.routes'
+import hdepreciacionRoutes from './routes/hdepreciacion.routes'
 import path from 'path'
 import * as middleware from './utils/middleware'
 import morgan from 'morgan'
@@ -49,6 +50,7 @@ app.use('/api/devoluciones', devolucionRoutes)
 app.use('/api/bajas', bajaRoutes)
 app.use('/api/traslados', trasladoRoutes)
 app.use('/api/trasladar', trasladarRoutes)
+app.use('/api/hdepreciacion', hdepreciacionRoutes)
 // Folder will be used to store public files
 app.use('/uploads', express.static(path.resolve('uploads')))
 app.use(morgan('dev'))
