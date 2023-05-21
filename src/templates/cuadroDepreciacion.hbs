@@ -8,42 +8,20 @@
   <title>Depreciación de activos</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
   <style>
+    *{
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
     header,
     footer {
       background-color: #559ba1;
     }
 
-    table {
-      width: 80%;
-      border-collapse: collapse;
-      border-spacing: 0;
-      margin-bottom: 20px;
-    }
-
-    table thead tr {
-      background: rgb(105, 102, 102);
-    }
-
-    table tr:nth-child(2n-1) td {
-      background: rgb(227, 220, 230);
-    }
-
     table th,
     table td {
       text-align: center;
-    }
-
-    table th {
-      padding: 5px 20px;
-      border-bottom: 1px solid #c1ced9;
-      white-space: nowrap;
-      font-weight: normal;
       font-size: 10px;
-    }
-
-    table td {
-      font-size: 14px;
-      padding: 5px;
     }
 
     h1 {
@@ -73,6 +51,19 @@
     .fecha-center {
       color: black;
     }
+
+    .cabe {
+      /* min-width: 50px; */
+      word-break: break-all;
+      white-space: normal;
+    }
+
+    .data-col {
+      font-size: 12px;
+      padding: 10px 30px;
+      margin-top: 50px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 
@@ -99,31 +90,72 @@
   <h1 class="text-center">CUADRO DE DEPRECIACIÓN DE ACTIVOS FIJOS</h1>
   <p class="text-center fecha-center">Al <span id="fecha1"></span></p>
   <section class="m-3">
+    <div class="container data">
+      <div class="row">
+        <div class="col-md-auto table-bordered data-col">
+          <b>Rubro:</b> {{data.grupo_contable}}
+        </div>
+        <div class="col-md-auto table-bordered data-col">
+          <b>Vida util:</b> {{data.vida_util}} meses
+        </div>
+        <div class="col-md-auto table-bordered data-col">
+          <b>UFV actual:</b> {{data.ufv_actual}}
+        </div>
+      </div>
+    </div>
     <table class="table table-bordered">
       <thead>
-        <tr>
-          <th>Código</th>
-          <th>Descripción</th>
-          <th>Fecha Ingreso</th>
-          <th>Valor inicial</th>
-          <th>Valor acumulado</th>
-          <th>Factor de act</th>
-          <th>Valor act</th>
-          <th>Inc por act</th>
-          <th>Dep acu ant</th>
-          <th>Inc dep acu</th>
-          <th>Dep del periodo</th>
-          <th>Dep acu act</th>
-          <th>Valor neto</th>
+        <tr class="table-danger">
+          <th>
+            <div class="cabe"> Código</div>
+          </th>
+          <th>
+            <div class="cabe"> Fecha ing.</div>
+          </th>
+          <th>
+            <div class="cabe"> Descripción</div>
+          </th>
+          <th>
+            <div class="cabe"> Vida restante</div>
+          </th>
+          <th>
+            <div class="cabe"> UFV inicial</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor inicial</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor residual</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor actualizado</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor final act</div>
+          </th>
+          <th>
+            <div class="cabe"> Dep mensual</div>
+          </th>
+          <th>
+            <div class="cabe"> Dep acumulada</div>
+          </th>
+          <th>
+            <div class="cabe"> Ajuste actualizacion</div>
+          </th>
+          <th>
+            <div class="cabe"> Dep actualizada</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor residual act</div>
+          </th>
         </tr>
       </thead>
       <tbody>
-        {{#each data as | activo |}}
+        {{#each data.data as | activo |}}
         <tr>
-          <td>{{activo.codigo_activo}}</td>
-          <td>{{activo.descripcion_activo}}</td>
-          <td>{{activo.fecha_ingreso}}</td>
-          <td>{{activo.costo}}</td>
+          <td>{{activo.codigo}}</td>
+          <td>{{activo.A}}</td>
+          <td>{{activo.descripcion}}</td>
           <td>{{activo.B}}</td>
           <td>{{activo.C}}</td>
           <td>{{activo.D}}</td>
@@ -133,6 +165,8 @@
           <td>{{activo.H}}</td>
           <td>{{activo.I}}</td>
           <td>{{activo.J}}</td>
+          <td>{{activo.K}}</td>
+          <td>{{activo.L}}</td>
         </tr>
         {{/each}}
       </tbody>

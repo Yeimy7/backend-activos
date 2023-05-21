@@ -469,7 +469,7 @@ export const actaDepreciacionActivos = async (req, res) => {
 }
 // ******************************************************
 export const cuadroDepreciacionActivos = async (req, res) => {
-  const { idGrupo, indice_actual } = req.body
+  const { idGrupo, indice_actual, mes_actual, anio_actual } = req.body
   try {
     const activos = await Activo.findAll({
       raw: true, where: {
@@ -499,20 +499,92 @@ export const cuadroDepreciacionActivos = async (req, res) => {
     })
 
     const itemsActivos = await Promise.all(activos.map(async activo => {
-      const { valor_residual: vr, dep_acumulada: da, indice_ufv: iu } = activo
-      const valores = await depreciacion(vr, da, iu, indice_actual, activo['grupo_contable.coeficiente'])
-      const { B, C, D, E, F, G, H, I, J } = valores;
+      const { fecha_ingreso: fi, valor_residual: vr, indice_ufv: iu, costo } = activo
+      const valores = await depreciacion(fi, mes_actual, anio_actual, activo['grupo_contable.vida_util'], costo, vr, iu, indice_actual)
+      const { B, F, G, H, I, J, K, L } = valores;
       return await {
-        ...activo,
+        // ...activo,
+        codigo: activo.codigo_activo,
         grupo_contable: activo['grupo_contable.descripcion_g'],
-        auxiliar: activo['descripcion_aux'], 
-        B, C, D, E, F, G, H, I, J
+        auxiliar: activo['auxiliar.descripcion_aux'],
+        vida_util: activo['grupo_contable.vida_util'],
+        descripcion: activo.descripcion_activo,
+        A: activo.fecha_ingreso,
+        C: iu,
+        D: activo.costo,
+        E: activo.valor_residual,
+        B: Number(B), F, G, H, I, J, K, L
       }
     }))
 
-    console.log(itemsActivos)
+    // console.log(itemsActivos)
     // res.status(201);
-    const pdf = await crearPDF('cuadroDepreciacion', itemsActivos)
+    const pdf = await crearPDF('cuadroDepreciacion',
+      {
+        grupo_contable: itemsActivos[0].grupo_contable,
+        vida_util: itemsActivos[0].vida_util * 12,
+        ufv_actual: indice_actual,
+        data: itemsActivos
+      })
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Hubo un error')
+  }
+}
+// ****************************************************
+export const depreciarActivos = async (req, res) => {
+  const { indice_actual, anio_actual } = req.body
+  if (!indice_actual) {
+    res.status(500).send('NO existe el indice actual')
+    return
+  }
+  try {
+    const activos = await Activo.findAll({
+      raw: true, where: { estado: 'A' }, include:
+        [
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+          }
+        ]
+    })
+
+    const mes_actual = 12
+
+    const itemsActivos = await Promise.all(activos.map(async activo => {
+      const { fecha_ingreso: fi, valor_residual: vr, indice_ufv: iu, costo } = activo
+      const valores = await depreciacion(fi, mes_actual,anio_actual, activo['grupo_contable.vida_util'], costo, vr, iu, indice_actual)
+      const { B, F, G, H, I, J, K, L } = valores;
+      let act = await Activo.findByPk(activo.id_activo)
+      act.valor_residual = G;
+      await act.save();
+      return await {
+        // ...activo,
+        codigo: activo.codigo_activo,
+        grupo_contable: activo['grupo_contable.descripcion_g'],
+        auxiliar: activo['auxiliar.descripcion_aux'],
+        vida_util: activo['grupo_contable.vida_util'],
+        descripcion: activo.descripcion_activo,
+        A: activo.fecha_ingreso,
+        C: iu,
+        D: activo.costo,
+        E: activo.valor_residual,
+        B: Number(B), F, G, H, I, J, K, L
+      }
+    }))
+
+    // console.log(itemsActivos)
+    // res.status(201);
+    const pdf = await crearPDF('cuadroDepreciacion',
+      {
+        grupo_contable: itemsActivos[0].grupo_contable,
+        vida_util: itemsActivos[0].vida_util * 12,
+        ufv_actual: indice_actual,
+        data: itemsActivos
+      })
     res.contentType('application/pdf');
     res.status(200).send(pdf)
 
@@ -768,7 +840,7 @@ export const totalActivos = async (_req, res) => {
   try {
     const totalActivos = await Activo.count({
       where: {
-        estado: 'A', 
+        estado: 'A',
       }
     })
     res.status(200).json(totalActivos)
