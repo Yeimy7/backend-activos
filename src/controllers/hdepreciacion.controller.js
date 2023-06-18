@@ -55,7 +55,6 @@ export const obtenerHdepreciacionPorIdActivo = async (req, res) => {
   try {
     const { id_activo } = req.body
 
-    console.log('*********************************************',id_activo)
     const hdepreciacion = await Hdepreciacion.findAll({
       raw: true, where: { id_activo }
     })

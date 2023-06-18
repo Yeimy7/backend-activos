@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de activos</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <style>
+    header,
+    footer {
+      background-color: #559ba1;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    h5 {
+      font-size: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      margin-bottom: 20px;
+    }
+
+    table thead tr {
+      height: 20px;
+      background: rgb(105, 102, 102);
+    }
+
+    table tr:nth-child(2n-1) td {
+      background: rgb(227, 220, 230);
+    }
+
+    table th {
+      padding: 5px 20px;
+      color: rgb(255, 255, 255);
+      border-bottom: 1px solid #c1ced9;
+      white-space: nowrap;
+      font-weight: normal;
+      font-size: 16px;
+    }
+
+    table th,
+    table td {
+      text-align: center;
+    }
+
+    table td {
+      font-size: 14px;
+      padding: 5px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-block: 50px;
+    }
+
+    h2 {
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 20px;
+    }
+
+    h4 {
+      font-size: 16px;
+    }
+
+    .firmas {
+      margin-block: 100px;
+    }
+
+    .linea {
+      border-top: 1px dotted #8f8f8f;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="row p-3 text-white m-3">
+    <div class="col">
+      <p class="lh-sm">
+        <span class="d-block">Zona Los Andes - Calle Balboa</span>
+        <span class="d-block">El Alto - Bolivia</span>
+      </p>
+      <p>Fecha: El Alto <span id="fecha"></span></p>
+    </div>
+    <div id="logo" class="col text-center">
+      <img src="http://localhost:3000/logo.jpg" width="100" height="100" alt="logo" />
+    </div>
+    <div class="col text-right">
+      <h5>Asociación Centro Virgen Niña - EPDB</h5>
+      <p class="lh-sm">
+        <span class="d-block">Teléfono: (591-2) 2841126</span>
+        <span class="d-block">Email: virgenninaepdb@gmail.com</span>
+      </p>
+    </div>
+  </header>
+
+  <h1 class="text-center">LISTA DE ACTIVOS FIJOS POR ENTIDAD</h1>
+  <section class="m-3">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Grupo contable</th>
+          <th>Custodio</th>
+          <th>Entidad</th>
+          <th>Descripción</th>
+          <th>Ambiente</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each data as | activo |}}
+        <tr>
+          <td>{{activo.codigo_activo}}</td>
+          <td>{{activo.grupo_contable}}</td>
+          <td>{{activo.custodio}}</td>
+          <td>{{activo.entidad}}</td>
+          <td>{{activo.descripcion_activo}}</td>
+          <td>{{activo.ambiente}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      </tbody>
+    </table>
+  </section>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    let today = new Date();
+    let month = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    document.getElementById("fecha").innerHTML += `${today.getDate()} de ${month[today.getMonth()]} de ${today.getFullYear()}`;
+  </script>
+</body>
+
+</html>

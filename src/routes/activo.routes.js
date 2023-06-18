@@ -34,6 +34,21 @@ router.get('/:activoId', [authJwt.verifyToken], activoController.obtenerActivoPo
 router.get('/codigo/:codigoActivo', activoController.obtenerActivoPorCodigo)
 router.get('/custodio/:idPersona', [authJwt.verifyToken], activoController.activosPorCustodio)
 router.get('/grupo/:idGrupo', [authJwt.verifyToken], activoController.activosPorGrupo)
+router.post(
+  "/grupo/pdf/:idGrupo",
+  [authJwt.verifyToken],
+  activoController.reporteActivosPorGrupo
+);
+router.post(
+  "/entidad/pdf/:idEntidad",
+  [authJwt.verifyToken],
+  activoController.reporteActivosPorEntidad
+);
+router.post(
+  "/custodio/pdf/:idPersona",
+  [authJwt.verifyToken],
+  activoController.reporteActivosPorCustodio
+);
 router.get('/entidad/:idEntidad', [authJwt.verifyToken], activoController.activosPorEntidad)
 router.put('/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin, veryfyAssetCode.checkDuplicateAssetCode], activoController.actualizarActivoPorId)
 router.put('/img/:activoId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin, multer.single('img_activo')], activoController.actualizarImagenActivoPorId)

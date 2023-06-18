@@ -850,3 +850,224 @@ export const totalActivos = async (_req, res) => {
     res.status(500).json({ msg: 'No se pudo encontrar el total' })
   }
 }
+
+
+/*
+ ******************************************************************************************** 
+ */
+
+ export const reporteActivosPorEntidad = async (req, res) => {
+  try {
+    const entidad = await Proveedor.findOne({
+      raw: true,
+      where: { id_proveedor: req.params.idEntidad },
+    });
+
+    const activos = await Activo.findAll({
+      raw: true,
+      where: {
+        estado: "A",
+        id_proveedor: req.params.idEntidad,
+        [Op.and]: [
+          { id_grupo: { [Op.not]: null } },
+          { id_grupo: { [Op.not]: "" } },
+        ],
+      },
+      include: [
+        {
+          model: Ambiente,
+          attributes: ["codigo_ambiente", "tipo_ambiente"],
+        },
+        {
+          model: Auxiliar,
+          attributes: ["descripcion_aux"],
+        },
+        {
+          model: GrupoContable,
+          attributes: ["descripcion_g", "vida_util", "coeficiente"],
+        },
+        {
+          model: Proveedor,
+          attributes: ["razon_social"],
+        },
+        {
+          model: Empleado,
+          attributes: ["id_persona", "id_cargo"],
+          include: {
+            model: Cargo,
+            attributes: ["descripcion_cargo"],
+          },
+        },
+      ],
+    });
+    const allDataActivos = await Promise.all(
+      activos.map(async (activo) => {
+        let person = await Person.findOne({
+          raw: true,
+          where: { id_persona: activo.id_persona },
+        });
+        if(!person){
+          person={
+            nombres:'no tiene',
+            apellidos:'custodio'
+          }
+        }
+        return await {
+          ambiente:
+            activo["ambiente.tipo_ambiente"] +
+            " " +
+            activo["ambiente.codigo_ambiente"],
+          codigo_activo: activo.codigo_activo,
+          descripcion_activo: activo.descripcion_activo,
+          grupo_contable: activo["grupo_contable.descripcion_g"],
+          entidad: entidad.razon_social,
+          custodio: person.nombres|'' + " " + person.apellidos|'',
+        };
+      })
+    );
+
+    const pdf = await crearPDF("listaPorEntidades", allDataActivos);
+    res.contentType("application/pdf");
+    res.status(200).send(pdf);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Hubo un error");
+  }
+};
+
+export const reporteActivosPorCustodio = async (req, res) => {
+  try {
+    const person = await Person.findOne({
+      raw: true,
+      where: { id_persona: req.params.idPersona },
+    });
+
+    const activos = await Activo.findAll({
+      raw: true,
+      where: {
+        estado: "A",
+        id_persona: req.params.idPersona,
+        [Op.and]: [
+          { id_persona: { [Op.not]: null } },
+          { id_persona: { [Op.not]: "" } },
+        ],
+      },
+      include: [
+        {
+          model: Ambiente,
+          attributes: ["codigo_ambiente", "tipo_ambiente"],
+        },
+        {
+          model: Auxiliar,
+          attributes: ["descripcion_aux"],
+        },
+        {
+          model: GrupoContable,
+          attributes: ["descripcion_g", "vida_util", "coeficiente"],
+        },
+        {
+          model: Proveedor,
+          attributes: ["razon_social"],
+        },
+        {
+          model: Empleado,
+          attributes: ["id_persona", "id_cargo"],
+          include: {
+            model: Cargo,
+            attributes: ["descripcion_cargo"],
+          },
+        },
+      ],
+    });
+    const allDataActivos = await Promise.all(
+      activos.map(async (activo) => {
+        return await {
+          ambiente:
+            activo["ambiente.tipo_ambiente"] +
+            " " +
+            activo["ambiente.codigo_ambiente"],
+          codigo_activo: activo.codigo_activo,
+          descripcion_activo: activo.descripcion_activo,
+          grupo_contable: activo["grupo_contable.descripcion_g"],
+          entidad: activo["proveedor.razon_social"],
+          custodio: person.nombres + " " + person.apellidos,
+        };
+      })
+    );
+
+    const pdf = await crearPDF("listaPorCustodio", allDataActivos);
+    res.contentType("application/pdf");
+    res.status(200).send(pdf);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Hubo un error");
+  }
+};
+
+export const reporteActivosPorGrupo = async (req, res) => {
+  try {
+    const activos = await Activo.findAll({
+      raw: true,
+      where: {
+        estado: "A",
+        id_grupo: req.params.idGrupo,
+        [Op.and]: [
+          { id_grupo: { [Op.not]: null } },
+          { id_grupo: { [Op.not]: "" } },
+        ],
+      },
+      include: [
+        {
+          model: Ambiente,
+          attributes: ["codigo_ambiente", "tipo_ambiente"],
+        },
+        {
+          model: Auxiliar,
+          attributes: ["descripcion_aux"],
+        },
+        {
+          model: GrupoContable,
+          attributes: ["descripcion_g", "vida_util", "coeficiente"],
+        },
+        {
+          model: Proveedor,
+          attributes: ["razon_social"],
+        },
+        {
+          model: Empleado,
+          attributes: ["id_persona", "id_cargo"],
+          include: {
+            model: Cargo,
+            attributes: ["descripcion_cargo"],
+          },
+        },
+      ],
+    });
+    const allDataActivos = await Promise.all(
+      activos.map(async (activo) => {
+        const person = await Person.findOne({
+          raw: true,
+          where: { id_persona: activo.id_persona },
+        });
+        return await {
+          ambiente:
+            activo["ambiente.tipo_ambiente"] +
+            " " +
+            activo["ambiente.codigo_ambiente"],
+          codigo_activo: activo.codigo_activo,
+          descripcion_activo: activo.descripcion_activo,
+          grupo_contable: activo["grupo_contable.descripcion_g"],
+          entidad: activo["proveedor.razon_social"],
+          custodio: person?person.nombres+ " " + person.apellidos:'--',
+        };
+      })
+    );
+
+    const pdf = await crearPDF("listaPorGrupo", allDataActivos);
+    res.contentType("application/pdf");
+    res.status(200).send(pdf);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Hubo un error");
+  }
+};
