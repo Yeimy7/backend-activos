@@ -534,7 +534,7 @@ export const cuadroDepreciacionActivos = async (req, res) => {
     res.status(500).send('Hubo un error')
   }
 }
-// ****************************************************
+// ******************************************************************
 export const depreciarActivos = async (req, res) => {
   const { indice_actual, anio_actual } = req.body
   if (!indice_actual) {

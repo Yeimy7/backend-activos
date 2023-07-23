@@ -1,6 +1,7 @@
 import * as Sequelize from 'sequelize'
 import conexion from '../config/db'
 import Activo from './Activo'
+import ValorUfv from './ValorUfv'
 
 const Hdepreciacion = conexion.define('hdepreciacion', {
   id_hdepreciacion: {
@@ -8,16 +9,15 @@ const Hdepreciacion = conexion.define('hdepreciacion', {
     primaryKey: true,
     defaultValue: Sequelize.UUIDV4
   },
-  gestion: {
-    type: Sequelize.INTEGER,
-    // defaultValue: new Date().getFullYear(),
-    allowNull: false,
-  },
   valor_residual: {
     type: Sequelize.FLOAT,
     allowNull: false
   },
   id_activo: {
+    type: Sequelize.UUID,
+    allowNull: false,
+  },
+  id_valor_ufv: {
     type: Sequelize.UUID,
     allowNull: false,
   },
@@ -29,5 +29,6 @@ const Hdepreciacion = conexion.define('hdepreciacion', {
 Hdepreciacion.sync()
 
 Hdepreciacion.belongsTo(Activo, { foreignKey: 'id_activo' })
+Hdepreciacion.belongsTo(ValorUfv, { foreignKey: 'id_valor_ufv' })
 
 export default Hdepreciacion;

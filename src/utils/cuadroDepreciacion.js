@@ -1,17 +1,17 @@
-function convertirAFecha(cadena) {
-  const arr = cadena.split("-");
-  arr[2] = "01";
-  return new Date(arr.join("-"));
-}
 
 function diferenciaMeses(fecha_ingreso, mesActual, anioActual) {
-  // const anio = new Date().getFullYear();
-  const ms = Date.parse(anioActual + "-" + mesActual + "-30");
-  const today = new Date(ms);
-  const back = convertirAFecha(fecha_ingreso);
-  return parseInt((today - back) / 2592000000);
+  const anios = anioActual-extraerAnio(fecha_ingreso)
+  const total=12-(extraerMes(fecha_ingreso)-1)
+  return total+(12*anios)
 }
 
+function extraerAnio(cadena){
+  return cadena.split("-")[0]
+}
+
+function extraerMes(cadena){
+  return cadena.split("-")[1]
+}
 
 function factorActualizacion(ufvActual, ufvAnterior) {
   return ufvActual / ufvAnterior;
@@ -25,8 +25,8 @@ function valorFinalActualizado(valorResidual, ajusteActualizacion) {
   return valorResidual + ajusteActualizacion;
 }
 
-function depAcumulada(mesesUsados, depMensual) {
-  return mesesUsados * depMensual;
+function depAcumulada(depMensual, vida_util, mesesUsados) {
+  return depMensual * (vida_util - mesesUsados);
 }
 
 function ajusteActualizacion(factorActualizacion, depAcumulada) {
@@ -54,11 +54,12 @@ export const depreciacion = async (
   const mesesUsados = await diferenciaMeses(fecha_ingreso, mesActual, anioActual)
   const vUtil = vida_util * 12
   const fa = await factorActualizacion(ufvActual, ufvAnterior);
-  const B = await vUtil - mesesUsados;
-  const F = await valorActualizado(fa, costo);
+  const B = mesesUsados > vUtil ? 0 : vUtil - mesesUsados;
+  // const B = await vUtil - mesesUsados;
+  const F = valorActualizado(fa, valorResidual);
   const G = await valorFinalActualizado(valorResidual, F);
   const H = (costo / vUtil);
-  const I = await depAcumulada(mesesUsados, H);
+  const I = await depAcumulada(H, vUtil, B);
   const J = await ajusteActualizacion(fa, I);
   const K = await depActualizada(I, J);
   const L = await valorResidualActualizado(G, K);
