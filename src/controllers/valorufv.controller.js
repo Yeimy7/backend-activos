@@ -42,7 +42,6 @@ export const obtenerValorUfvPorId = async (req, res) => {
 
 export const obtenerValorUfvPorGestion = async (req, res) => {
   const { gestion } = req.body;
-  console.log('----------------> gestion', gestion)
   try {
 
     const valorUfv = await ValorUfv.findAll({
@@ -66,4 +65,13 @@ export const obtenerUltimaGestion = async (_req, res) => {
   }
 }
 
-
+export const obtenerGestiones = async (_req, res) => {
+  try {
+    const gestiones = await ValorUfv.findAll({
+      raw: true, attributes: ['gestion'], order:['gestion']
+    })
+    res.status(200).json(gestiones)
+  } catch (error) {
+    res.status(500).send('Hubo un error')
+  }
+}

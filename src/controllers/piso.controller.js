@@ -76,15 +76,10 @@ export const bajaPisoPorId = async (req, res) => {
   }
 }
 
-export const pisosPorEdificio = (req, res) => {
-  const errores = validationResult(req)
-  if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
-  }
-
-  const { id_piso } = req.body;
+export const obtenerPisosPorEdificio = async (req, res) => {
+  // const { id_piso } = req.body;
   try {
-    const pisos = await Piso.findAll({ where: { estado: 'A', id_piso } })
+    const pisos = await Piso.findAll({ where: { estado: 'A', id_edificio: req.params.edificioId } })
     res.status(200).json(pisos)
   } catch (error) {
     res.status(500).send('Hubo un error')

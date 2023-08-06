@@ -16,6 +16,11 @@ const Ambiente = conexion.define('ambiente', {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  estado: {
+    type: Sequelize.STRING,
+    defaultValue: 'A',
+    allowNull: false
+  },
   id_piso: {
     type: Sequelize.UUID,
     allowNull: false,

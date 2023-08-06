@@ -12,6 +12,11 @@ const Piso = conexion.define('piso', {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  estado: {
+    type: Sequelize.STRING,
+    defaultValue: 'A',
+    allowNull: false
+  },
   id_edificio: {
     type: Sequelize.UUID,
     allowNull: false,

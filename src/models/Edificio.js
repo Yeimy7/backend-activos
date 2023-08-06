@@ -10,7 +10,12 @@ const Edificio = conexion.define('edificio', {
   nombre_edificio: {
     type: Sequelize.STRING,
     allowNull: false,
-  }
+  },
+  estado: {
+    type: Sequelize.STRING,
+    defaultValue: 'A',
+    allowNull: false
+  },
 }, {
   freezeTableName: true,
   timestamps: false,

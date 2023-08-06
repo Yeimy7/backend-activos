@@ -26,13 +26,15 @@ import trasladoRoutes from './routes/traslado.routes'
 import trasladarRoutes from './routes/activo_traslado.routes'
 import hdepreciacionRoutes from './routes/hdepreciacion.routes'
 import valorUfvRoutes from './routes/valor_ufv.routes'
+import pisoRoutes from './routes/piso.routes'
+import edificioRoutes from './routes/edificio.routes'
 import path from 'path'
 import * as middleware from './utils/middleware'
 import morgan from 'morgan'
 
 app.use(cors())
 app.use(express.static('build'))
-app.use(express.static( 'public'));
+app.use(express.static('public'));
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use('/api/assets', assetsRoutes)
@@ -47,6 +49,8 @@ app.use('/api/asignados', asignarRoutes)
 app.use('/api/auxiliares', auxiliarRoutes)
 app.use('/api/grupos', grupoRoutes)
 app.use('/api/ambientes', ambienteRoutes)
+app.use('/api/pisos', pisoRoutes)
+app.use('/api/edificios', edificioRoutes)
 app.use('/api/devoluciones', devolucionRoutes)
 app.use('/api/bajas', bajaRoutes)
 app.use('/api/traslados', trasladoRoutes)

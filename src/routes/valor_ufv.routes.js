@@ -15,6 +15,7 @@ router.post('/',
   valorUfvController.crearValorUfv)
   router.get('/', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], valorUfvController.obtenerValoresUfv)
   router.get('/gestion', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], valorUfvController.obtenerValorUfvPorGestion)
+  router.get('/gestiones', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], valorUfvController.obtenerGestiones)
   router.get('/max-gestion', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], valorUfvController.obtenerUltimaGestion)
   router.get('/:valorUfvId', [authJwt.verifyToken, authJwt.isSuperAdminOrAdmin], valorUfvController.obtenerValorUfvPorId)
 

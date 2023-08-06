@@ -7,6 +7,7 @@ import Auxiliar from '../models/Auxiliar'
 import GrupoContable from '../models/GrupoContable'
 import Proveedor from '../models/Proveedor'
 import { depreciacion } from '../utils/cuadroDepreciacion'
+import { crearPDF } from '../utils/generarPDF'
 
 export const crearHdepreciacion = async (req, res) => {
   // Revisar si hay errores
@@ -124,7 +125,7 @@ export const crearHdepreciaciones = async (req, res) => {
     res.status(200).json({ msj: 'Depreciaciones realizadas exitosamente' })
   } catch (error) {
     console.log(error);
-    res.status(400).json({ msg: 'Hubo un error al intentar registrar la hdepreciacion' })
+    res.status(400).json({ msj: 'Hubo un error al intentar registrar la hdepreciacion' })
   }
 }
 
@@ -171,7 +172,7 @@ export const cuadroDepreciacion = async (req, res) => {
       raw: true, where: { gestion }
     })
 
-    const itemsActivos = await Promise.all(hdepreciaciones.map(async activo => {
+    const itemsActivos = await Promise.all(hdepreciaciones?.map(async activo => {
       const valores = await depreciacion(activo['activo.fecha_ingreso'], 12, gestion, activo['activo.grupo_contable.vida_util'], activo['activo.costo'], activo.valor_residual, activo['activo.indice_ufv'], valorUfv[0].valor)
       const { B, F, G, H, I, J, K, L } = valores;
       return await {
@@ -191,16 +192,16 @@ export const cuadroDepreciacion = async (req, res) => {
 
     // console.log(itemsActivos)
     // res.status(201);
-    // const pdf = await crearPDF('cuadroDepreciacion',
-    //   {
-    //     grupo_contable: itemsActivos[0].grupo_contable,
-    //     vida_util: itemsActivos[0].vida_util * 12,
-    //     ufv_actual: indice_actual,
-    //     data: itemsActivos
-    //   })
-    // res.contentType('application/pdf');
-    // res.status(200).send(pdf)
-    res.status(200).send(itemsActivos)
+    const pdf = await crearPDF('cuadroDepreciacion',
+      {
+        grupo_contable: itemsActivos[0]?.grupo_contable,
+        vida_util: itemsActivos[0]?.vida_util * 12,
+        ufv_actual: valorUfv[0]?.valor,
+        data: itemsActivos
+      })
+    res.contentType('application/pdf');
+    res.status(200).send(pdf)
+    // res.status(200).send(itemsActivos)
 
   } catch (error) {
     console.log(error)

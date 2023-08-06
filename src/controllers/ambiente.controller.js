@@ -50,7 +50,7 @@ export const actualizarAmbientePorId = async (req, res) => {
       isModified = true
     }
     if (tipo_ambiente && tipo_ambiente !== ambiente.tipo_ambiente) {
-      proveedor.tipo_ambiente = tipo_ambiente
+      ambiente.tipo_ambiente = tipo_ambiente
       isModified = true
     }
     let ambienteActualizado
@@ -81,15 +81,9 @@ export const bajaAmbientePorId = async (req, res) => {
   }
 }
 
-export const ambientesPorPiso = (req, res) => {
-  const errores = validationResult(req)
-  if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
-  }
-
-  const { id_piso } = req.body;
+export const obtenerAmbientesPorPiso = async (req, res) => {
   try {
-    const ambientes = await Ambiente.findAll({ where: { estado: 'A', id_piso } })
+    const ambientes = await Ambiente.findAll({ where: { estado: 'A', id_piso: req.params.pisoId } })
     res.status(200).json(ambientes)
   } catch (error) {
     res.status(500).send('Hubo un error')
