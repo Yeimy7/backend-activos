@@ -556,7 +556,7 @@ export const depreciarActivos = async (req, res) => {
 
     const itemsActivos = await Promise.all(activos.map(async activo => {
       const { fecha_ingreso: fi, valor_residual: vr, indice_ufv: iu, costo } = activo
-      const valores = await depreciacion(fi, mes_actual,anio_actual, activo['grupo_contable.vida_util'], costo, vr, iu, indice_actual)
+      const valores = await depreciacion(fi, mes_actual, anio_actual, activo['grupo_contable.vida_util'], costo, vr, iu, indice_actual)
       const { B, F, G, H, I, J, K, L } = valores;
       let act = await Activo.findByPk(activo.id_activo)
       act.valor_residual = G;
@@ -649,11 +649,17 @@ export const actaAsignacionActivo = async (req, res) => {
   }
 }
 
-export const codigosActivos = async (_req, res) => {
+export const codigosActivos = async (req, res) => {
+  let { codigoActivos } = req.body
   try {
-    const activos = await Activo.findAll({
-      raw: true, where: { estado: 'A' }, attributes: ['codigo_activo']
-    })
+    let activos
+    if (codigoActivos !== null && codigoActivos !== '') {
+      activos = codigoActivos
+    } else {
+      activos = await Activo.findAll({
+        raw: true, where: { estado: 'A' }, attributes: ['codigo_activo']
+      })
+    }
     const pdf = await crearPDF('listaCodigoActivo', activos)
     res.contentType('application/pdf');
     res.status(200).send(pdf)
@@ -856,7 +862,7 @@ export const totalActivos = async (_req, res) => {
  ******************************************************************************************** 
  */
 
- export const reporteActivosPorEntidad = async (req, res) => {
+export const reporteActivosPorEntidad = async (req, res) => {
   try {
     const entidad = await Proveedor.findOne({
       raw: true,
@@ -906,10 +912,10 @@ export const totalActivos = async (_req, res) => {
           raw: true,
           where: { id_persona: activo.id_persona },
         });
-        if(!person){
-          person={
-            nombres:'no tiene',
-            apellidos:'custodio'
+        if (!person) {
+          person = {
+            nombres: 'no tiene',
+            apellidos: 'custodio'
           }
         }
         return await {
@@ -921,7 +927,7 @@ export const totalActivos = async (_req, res) => {
           descripcion_activo: activo.descripcion_activo,
           grupo_contable: activo["grupo_contable.descripcion_g"],
           entidad: entidad.razon_social,
-          custodio: person.nombres|'' + " " + person.apellidos|'',
+          custodio: person.nombres | '' + " " + person.apellidos | '',
         };
       })
     );
@@ -1058,7 +1064,7 @@ export const reporteActivosPorGrupo = async (req, res) => {
           descripcion_activo: activo.descripcion_activo,
           grupo_contable: activo["grupo_contable.descripcion_g"],
           entidad: activo["proveedor.razon_social"],
-          custodio: person?person.nombres+ " " + person.apellidos:'--',
+          custodio: person ? person.nombres + " " + person.apellidos : '--',
         };
       })
     );
