@@ -34,6 +34,7 @@ router.get('/:activoId', [authJwt.verifyToken], activoController.obtenerActivoPo
 router.get('/codigo/:codigoActivo', activoController.obtenerActivoPorCodigo)
 router.get('/custodio/:idPersona', [authJwt.verifyToken], activoController.activosPorCustodio)
 router.get('/grupo/:idGrupo', [authJwt.verifyToken], activoController.activosPorGrupo)
+router.post('/excel', [authJwt.verifyToken], activoController.listaActivosExcel)
 router.post(
   "/grupo/pdf/:idGrupo",
   [authJwt.verifyToken],

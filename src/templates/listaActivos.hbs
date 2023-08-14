@@ -8,6 +8,10 @@
   <title>Lista de activos</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
   <style>
+
+    body{
+      box-sizing: border-box;
+    }
     header,
     footer {
       background-color: #559ba1;
@@ -43,17 +47,11 @@
       border-bottom: 1px solid #c1ced9;
       white-space: nowrap;
       font-weight: normal;
-      font-size: 16px;
-    }
-
-    table th,
-    table td {
-      text-align: center;
+      font-size: 14px;
     }
 
     table td {
       font-size: 14px;
-      padding: 5px;
     }
 
     h1 {
@@ -93,7 +91,7 @@
       <p>Fecha: El Alto <span id="fecha"></span></p>
     </div>
     <div id="logo" class="col text-center">
-      <img src="http://localhost:3000/logo.jpg" width="100" height="100" alt="logo" />
+      <img src="http://localhost:3000/logo.jpg" width="100" height="100" alt="logo" class="img-thumbnail"/>
     </div>
     <div class="col text-right">
       <h5>Asociación Centro Virgen Niña - EPDB</h5>
@@ -109,21 +107,23 @@
     <table>
       <thead>
         <tr>
+          <th>Nro</th>
           <th>Código</th>
-          <th>Incorporación</th>
           <th>Descripción</th>
-          <th>Código ambiente</th>
-          <th>Tipo ambiente</th>
+          <th>Fecha ingreso</th>
+          <th>Ambiente</th>
+          <th>Grupo</th>
         </tr>
       </thead>
       <tbody>
         {{#each data as | activo |}}
         <tr>
+          <td>{{activo.num}}</td>
           <td>{{activo.codigo_activo}}</td>
-          <td>{{activo.fecha_ingreso}}</td>
           <td>{{activo.descripcion_activo}}</td>
-          <td>{{activo.codigo_ambiente}}</td>
-          <td>{{activo.tipo_ambiente}}</td>
+          <td>{{activo.fecha_ingreso}}</td>
+          <td>{{activo.tipo_codigo_ambiente}}</td>
+          <td>{{activo.grupo}}</td>
         </tr>
         {{/each}}
       </tbody>

@@ -1,22 +1,22 @@
-import Activo from '../models/Activo'
-import { validationResult } from 'express-validator'
-import Ambiente from '../models/Ambiente'
-import Auxiliar from '../models/Auxiliar'
-import GrupoContable from '../models/GrupoContable'
-import Proveedor from '../models/Proveedor'
-
 import path from 'path'
 import fs from 'fs-extra'
-import Empleado from '../models/Empleado'
-import Person from '../models/Person'
+import xl from 'excel4node'
+import { validationResult } from 'express-validator'
 import { Op } from 'sequelize'
 import { crearPDF } from '../utils/generarPDF'
 import { calculoDepreciacionActivoMes } from '../utils/calculoDepreciacion'
-import Cargo from '../models/Cargo'
-import Piso from '../models/Piso'
-import Edificio from '../models/Edificio'
-import Area from '../models/Area'
 import { depreciacion } from '../utils/cuadroDepreciacion'
+import Activo from '../models/Activo'
+import Ambiente from '../models/Ambiente'
+import Area from '../models/Area'
+import Auxiliar from '../models/Auxiliar'
+import Cargo from '../models/Cargo'
+import Edificio from '../models/Edificio'
+import Empleado from '../models/Empleado'
+import GrupoContable from '../models/GrupoContable'
+import Proveedor from '../models/Proveedor'
+import Person from '../models/Person'
+import Piso from '../models/Piso'
 
 export const crearActivo = async (req, res) => {
   // Revisar si hay errores
@@ -402,14 +402,19 @@ export const actaActivos = async (_req, res) => {
           {
             model: Ambiente,
             attributes: ['codigo_ambiente', 'tipo_ambiente']
+          },
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g']
           }
         ]
     })
-    const itemsActivos = activos.map(activo => {
+    const itemsActivos = activos.map((activo, index) => {
       return {
         ...activo,
-        codigo_ambiente: activo['ambiente.codigo_ambiente'],
-        tipo_ambiente: activo['ambiente.tipo_ambiente'],
+        num: index + 1,
+        tipo_codigo_ambiente: `${activo['ambiente.tipo_ambiente']} ${activo['ambiente.codigo_ambiente']}`,
+        grupo:activo['grupo_contable.descripcion_g'] ,
       }
     })
     const pdf = await crearPDF('listaActivos', itemsActivos)
@@ -421,8 +426,14 @@ export const actaActivos = async (_req, res) => {
   }
 }
 
-export const actaDepreciacionActivos = async (req, res) => {
-  const { mes, anio } = req.body
+export const listaActivosExcel = async (req, res) => {
+
+  // Fecha
+  let date = new Date()
+  let fechaDia = date.getUTCDate()
+  let fechaMes = (date.getUTCMonth()) + 1;
+  let fechaAnio = date.getUTCFullYear();
+
   try {
     const activos = await Activo.findAll({
       raw: true, where: { estado: 'A' }, include:
@@ -432,168 +443,93 @@ export const actaDepreciacionActivos = async (req, res) => {
             attributes: ['codigo_ambiente', 'tipo_ambiente']
           },
           {
-            model: Auxiliar,
-            attributes: ['descripcion_aux']
-          },
-          {
             model: GrupoContable,
-            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
-          }
-        ]
-    })
-
-    const itemsActivos = (activos.map(activo => {
-      const valor_actual = calculoDepreciacionActivoMes(
-        {
-          costo: activo.costo,
-          coeficiente: activo['grupo_contable.coeficiente'],
-          vida_util: activo['grupo_contable.vida_util'],
-          fecha_ingreso: activo.fecha_ingreso,
-          mes: mes,
-          anio: anio
-        })
-      return {
-        ...activo,
-        grupo_contable: activo['grupo_contable.descripcion_g'],
-        valor_actual: valor_actual
-      }
-    }))
-    const pdf = await crearPDF('depreciacionActivos', itemsActivos)
-    res.contentType('application/pdf');
-    res.status(200).send(pdf)
-
-  } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
-  }
-}
-// ******************************************************
-export const cuadroDepreciacionActivos = async (req, res) => {
-  const { idGrupo, indice_actual, mes_actual, anio_actual } = req.body
-  try {
-    const activos = await Activo.findAll({
-      raw: true, where: {
-        estado: 'A',
-        id_grupo: idGrupo,
-        [Op.and]: [
-          { id_grupo: { [Op.not]: null } },
-          { id_grupo: { [Op.not]: '' } }
-        ],
-      },
-      include:
-        [
-          {
-            model: Auxiliar,
-            attributes: ['descripcion_aux']
-          },
-          {
-            model: GrupoContable,
-            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+            attributes: ['descripcion_g']
           },
           {
             model: Proveedor,
             attributes: ['razon_social']
-          },
-
-        ]
-    })
-
-    const itemsActivos = await Promise.all(activos.map(async activo => {
-      const { fecha_ingreso: fi, valor_residual: vr, indice_ufv: iu, costo } = activo
-      const valores = await depreciacion(fi, mes_actual, anio_actual, activo['grupo_contable.vida_util'], costo, vr, iu, indice_actual)
-      const { B, F, G, H, I, J, K, L } = valores;
-      return await {
-        // ...activo,
-        codigo: activo.codigo_activo,
-        grupo_contable: activo['grupo_contable.descripcion_g'],
-        auxiliar: activo['auxiliar.descripcion_aux'],
-        vida_util: activo['grupo_contable.vida_util'],
-        descripcion: activo.descripcion_activo,
-        A: activo.fecha_ingreso,
-        C: iu,
-        D: activo.costo,
-        E: activo.valor_residual,
-        B: Number(B), F, G, H, I, J, K, L
-      }
-    }))
-
-    // console.log(itemsActivos)
-    // res.status(201);
-    const pdf = await crearPDF('cuadroDepreciacion',
-      {
-        grupo_contable: itemsActivos[0].grupo_contable,
-        vida_util: itemsActivos[0].vida_util * 12,
-        ufv_actual: indice_actual,
-        data: itemsActivos
-      })
-    res.contentType('application/pdf');
-    res.status(200).send(pdf)
-
-  } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
-  }
-}
-// ******************************************************************
-export const depreciarActivos = async (req, res) => {
-  const { indice_actual, anio_actual } = req.body
-  if (!indice_actual) {
-    res.status(500).send('NO existe el indice actual')
-    return
-  }
-  try {
-    const activos = await Activo.findAll({
-      raw: true, where: { estado: 'A' }, include:
-        [
-          {
-            model: GrupoContable,
-            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
           }
         ]
     })
 
-    const mes_actual = 12
+    let wb = new xl.Workbook();
+    let nombreArchivo = `listaActivos${fechaDia}_${fechaMes}_${fechaAnio}`
 
-    const itemsActivos = await Promise.all(activos.map(async activo => {
-      const { fecha_ingreso: fi, valor_residual: vr, indice_ufv: iu, costo } = activo
-      const valores = await depreciacion(fi, mes_actual, anio_actual, activo['grupo_contable.vida_util'], costo, vr, iu, indice_actual)
-      const { B, F, G, H, I, J, K, L } = valores;
-      let act = await Activo.findByPk(activo.id_activo)
-      act.valor_residual = G;
-      await act.save();
-      return await {
-        // ...activo,
-        codigo: activo.codigo_activo,
-        grupo_contable: activo['grupo_contable.descripcion_g'],
-        auxiliar: activo['auxiliar.descripcion_aux'],
-        vida_util: activo['grupo_contable.vida_util'],
-        descripcion: activo.descripcion_activo,
-        A: activo.fecha_ingreso,
-        C: iu,
-        D: activo.costo,
-        E: activo.valor_residual,
-        B: Number(B), F, G, H, I, J, K, L
+    let ws = wb.addWorksheet(nombreArchivo)
+
+    let columnaEstilo = wb.createStyle({
+      font: {
+        name: 'Arial',
+        color: '#000000',
+        size: 13,
+        bold: true
       }
-    }))
+    })
 
-    // console.log(itemsActivos)
-    // res.status(201);
-    const pdf = await crearPDF('cuadroDepreciacion',
-      {
-        grupo_contable: itemsActivos[0].grupo_contable,
-        vida_util: itemsActivos[0].vida_util * 12,
-        ufv_actual: indice_actual,
-        data: itemsActivos
-      })
-    res.contentType('application/pdf');
-    res.status(200).send(pdf)
+    let contenidoEstilo = wb.createStyle({
+      font: {
+        name: 'Arial',
+        color: '#494949',
+        size: 12,
+        bold: false
+      }
+    })
+    ws.column(1).setWidth(5)
+    ws.column(3).setWidth(35)
+    ws.column(5).setWidth(25)
+    ws.column(6).setWidth(25)
+    //NOmbre de las columnas
+    ws.cell(1, 1).string('Nro').style(columnaEstilo)
+    ws.cell(1, 2).string('Código').style(columnaEstilo)
+    ws.cell(1, 3).string('Descripcion').style(columnaEstilo)
+    ws.cell(1, 4).string('Fecha ingreso').style(columnaEstilo)
+    ws.cell(1, 5).string('Ambiente').style(columnaEstilo)
+    ws.cell(1, 6).string('Grupo').style(columnaEstilo)
+    ws.cell(1, 7).string('Entidad').style(columnaEstilo)
 
+    activos.forEach((activo, index) => {
+      ws.cell(index + 2, 1).number(index + 1).style(contenidoEstilo)
+      ws.cell(index + 2, 2).string(activo.codigo_activo).style(contenidoEstilo)
+      ws.cell(index + 2, 3).string(activo.descripcion_activo).style(contenidoEstilo)
+      ws.cell(index + 2, 4).string(activo.fecha_ingreso).style(contenidoEstilo)
+      ws.cell(index + 2, 5).string(`${activo['ambiente.tipo_ambiente']} ${activo['ambiente.codigo_ambiente']}`).style(contenidoEstilo)
+      ws.cell(index + 2, 6).string(activo['grupo_contable.descripcion_g']).style(contenidoEstilo)
+      ws.cell(index + 2, 7).string(activo['proveedor.razon_social']).style(contenidoEstilo)
+    });
+
+    //Ruta del archivo
+    const pathExcel = path.join(__dirname, 'excel', nombreArchivo + '.xlsx')
+
+    //Escribir o guardar
+    wb.write(pathExcel, async (err, stats) => {
+      if (err) {
+        console.error('Error al crear el archivo Excel', err);
+        res.status(500).send('Error al crear el archivo Excel');
+      }
+      else {
+        res.setHeader('Content-Disposition', 'attachment; filename=archivo.xlsx');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.sendFile(pathExcel, (error) => {
+          if (error) {
+            console.error('Error al enviar el archivo Excel al cliente', error);
+          }
+          // Eliminar el archivo después de servirlo
+          fs.unlink(pathExcel, (unlinkError) => {
+            if (unlinkError) {
+              console.error('Error al eliminar el archivo', unlinkError);
+            } else {
+              console.log('Archivo descargado y eliminado correctamente');
+            }
+          });
+        });
+      }
+    })
   } catch (error) {
     console.log(error)
     res.status(500).send('Hubo un error')
   }
 }
-// ****************************************************
 
 export const actaAsignacionActivo = async (req, res) => {
   //Buscar cargo jefe de unidad de activos fijos 

@@ -17,8 +17,14 @@ export const crearPDF = async (template, activos) => {
 
   const pdf = await pagina.pdf({
     path: `./uploads/document.pdf`,
-    format: 'A4',
-    printBackground: true
+    format: 'letter',
+    printBackground: true,
+    margin: {
+      top: '20mm',    // Márgenes superiores de 20mm
+      right: '10mm',  // Márgenes derechos de 20mm
+      bottom: '20mm', // Márgenes inferiores de 20mm
+      left: '10mm',   // Márgenes izquierdos de 20mm
+    },
   })
 
   console.log("done creating pdf")
