@@ -1,13 +1,16 @@
+import path from 'path'
+import fs from 'fs-extra'
+import xl from 'excel4node'
+import { validationResult } from 'express-validator'
+import { Op, Sequelize } from 'sequelize'
+import { depreciacion } from '../utils/cuadroDepreciacion'
+import { crearPDF } from '../utils/generarPDF'
 import Hdepreciacion from '../models/HDepreciacion'
 import Activo from '../models/Activo'
-import { validationResult } from 'express-validator'
 import ValorUfv from '../models/ValorUfv'
-import { Op, Sequelize } from 'sequelize'
 import Auxiliar from '../models/Auxiliar'
 import GrupoContable from '../models/GrupoContable'
 import Proveedor from '../models/Proveedor'
-import { depreciacion } from '../utils/cuadroDepreciacion'
-import { crearPDF } from '../utils/generarPDF'
 
 export const crearHdepreciacion = async (req, res) => {
   // Revisar si hay errores
@@ -130,7 +133,7 @@ export const crearHdepreciaciones = async (req, res) => {
 }
 
 export const cuadroDepreciacion = async (req, res) => {
-  const { id_grupo, gestion } = req.body
+  const { id_grupo, gestion, isPdf } = req.body
   try {
 
     const hdepreciaciones = await Hdepreciacion.findAll({
@@ -189,37 +192,180 @@ export const cuadroDepreciacion = async (req, res) => {
         B: Number(B), F, G, H, I, J, K, L
       }
     }))
+    const valores = {
+      grupo_contable: itemsActivos[0]?.grupo_contable,
+      vida_util: itemsActivos[0]?.vida_util * 12,
+      ufv_actual: valorUfv[0]?.valor,
+      gestion,
+      data: itemsActivos
+    }
 
-    // console.log(itemsActivos)
-    // res.status(201);
-    const pdf = await crearPDF('cuadroDepreciacion',
-      {
-        grupo_contable: itemsActivos[0]?.grupo_contable,
-        vida_util: itemsActivos[0]?.vida_util * 12,
-        ufv_actual: valorUfv[0]?.valor,
-        data: itemsActivos
+    if (isPdf) {
+      const pdf = await crearPDF('cuadroDepreciacion', valores)
+      res.contentType('application/pdf');
+      res.status(200).send(pdf)
+    } else {
+      // Fecha
+      let date = new Date()
+      let fechaDia = date.getUTCDate()
+      let fechaMes = (date.getUTCMonth()) + 1;
+      let fechaAnio = date.getUTCFullYear();
+
+      let wb = new xl.Workbook();
+      let nombreArchivo = `cuadroActivos${fechaDia}_${fechaMes}_${fechaAnio}`
+
+      let ws = wb.addWorksheet(nombreArchivo)
+
+      let columnaEstilo = wb.createStyle({
+        font: {
+          name: 'Arial',
+          color: '#000000',
+          size: 10,
+          bold: true
+        },
+        alignment: {
+          horizontal: 'center',
+        },
       })
-    res.contentType('application/pdf');
-    res.status(200).send(pdf)
-    // res.status(200).send(itemsActivos)
+      let titulo = wb.createStyle({
+        font: {
+          name: 'Arial',
+          color: '#000000',
+          size: 10,
+          bold: true,
+          italics: true,
 
+        },
+        alignment: {
+          horizontal: 'center',
+        },
+      })
+
+      let contenidoEstilo = wb.createStyle({
+        font: {
+          name: 'Arial',
+          color: '#494949',
+          size: 8,
+          bold: false
+        }
+      })
+      ws.cell(1, 1, 1, 4, true).string('CENTRO VIRGEN NIÑA - EPDB').style(titulo);
+      ws.cell(2, 1, 2, 4, true).string(`ACTIVO FIJO AL 31 DE DICIEMBRE DE ${gestion}`).style(titulo);
+
+      ws.column(1).setWidth(12)
+      ws.column(4).setWidth(5)
+      ws.column(5).setWidth(25)
+      ws.column(6).setWidth(5)
+      ws.column(7).setWidth(5)
+      ws.column(8).setWidth(5)
+      ws.column(9).setWidth(7)
+      ws.column(10).setWidth(12)
+      ws.column(11).setWidth(12)
+      ws.column(12).setWidth(12)
+      ws.column(13).setWidth(12)
+      ws.column(14).setWidth(12)
+      ws.column(15).setWidth(12)
+      ws.column(16).setWidth(12)
+      ws.column(17).setWidth(12)
+      ws.column(18).setWidth(12)
+      ws.column(19).setWidth(12)
+      //NOmbre de las columnas
+
+      ws.cell(3, 12).string(`UFV's al 31/12/${gestion}`).style(columnaEstilo)
+      ws.cell(3, 14).number(valorUfv[0]?.valor).style(columnaEstilo)
+
+      ws.cell(4, 7).string('Vida').style(columnaEstilo);
+      ws.cell(4, 8).string('Vida').style(columnaEstilo);
+      ws.cell(4, 10).string('Valor inicial').style(columnaEstilo);
+      ws.cell(4, 11).string(`Valor final ${gestion - 1}`).style(columnaEstilo);
+      ws.cell(4, 12).string('Ajuste').style(columnaEstilo);
+      ws.cell(4, 13).string('Valor Final').style(columnaEstilo);
+      ws.cell(4, 14).string('Depreciación mensual').style(columnaEstilo);
+      ws.cell(4, 15).string('Depreciación anual').style(columnaEstilo);
+      ws.cell(4, 16).string('Depreciación acumulada').style(columnaEstilo);
+      ws.cell(4, 17).string('Ajuste').style(columnaEstilo);
+      ws.cell(4, 18).string('Deprec.').style(columnaEstilo);
+      ws.cell(4, 19).string('Valor residual').style(columnaEstilo);
+
+
+      ws.cell(5, 1).string('Grupo').style(columnaEstilo)
+      ws.cell(5, 2).string('Código').style(columnaEstilo)
+      ws.cell(5, 3).string('Fecha ingreso').style(columnaEstilo)
+      ws.cell(5, 4).string('Nro').style(columnaEstilo)
+      ws.cell(5, 5).string('Descripcion').style(columnaEstilo)
+      ws.cell(5, 6).string('Cant.').style(columnaEstilo)
+      ws.cell(5, 7).string('Util').style(columnaEstilo)
+      ws.cell(5, 8).string('Res.').style(columnaEstilo)
+      ws.cell(5, 10).string('Bolivianos').style(columnaEstilo)
+      ws.cell(5, 11).string('Bolivianos').style(columnaEstilo)
+      ws.cell(5, 12).string('Actualización').style(columnaEstilo)
+      ws.cell(5, 13).string('Actualizado').style(columnaEstilo)
+      ws.cell(5, 14).string('Bolivianos').style(columnaEstilo)
+      ws.cell(5, 15).string('Bolivianos').style(columnaEstilo)
+      ws.cell(5, 16).string('Bolivianos').style(columnaEstilo)
+      ws.cell(5, 17).string('Actualización').style(columnaEstilo)
+      ws.cell(5, 18).string('Actualizada').style(columnaEstilo)
+      ws.cell(5, 19).string('Actualizado').style(columnaEstilo)
+
+
+
+
+      itemsActivos.forEach((activo, index) => {
+        ws.cell(index + 6, 1).string(valores.grupo_contable).style(contenidoEstilo)
+        ws.cell(index + 6, 2).string(activo.codigo).style(contenidoEstilo)
+        ws.cell(index + 6, 3).string(activo.A).style(contenidoEstilo)
+        ws.cell(index + 6, 4).number(index + 1).style(contenidoEstilo)
+        ws.cell(index + 6, 5).string(activo.descripcion).style(contenidoEstilo)
+        ws.cell(index + 6, 7).number(valores.vida_util).style(contenidoEstilo)
+        ws.cell(index + 6, 8).number(activo.B).style(contenidoEstilo)
+        ws.cell(index + 6, 9).number(activo.C).style(contenidoEstilo)
+        ws.cell(index + 6, 10).number(activo.D).style(contenidoEstilo)
+        ws.cell(index + 6, 11).number(activo.E).style(contenidoEstilo)
+        ws.cell(index + 6, 12).string(activo.F).style(contenidoEstilo)
+        ws.cell(index + 6, 13).string(activo.G).style(contenidoEstilo)
+        ws.cell(index + 6, 14).string(activo.H).style(contenidoEstilo)
+        ws.cell(index + 6, 15).string((Number(activo.H)*12).toFixed(2)).style(contenidoEstilo)
+        ws.cell(index + 6, 16).string(activo.I).style(contenidoEstilo)
+        ws.cell(index + 6, 17).string(activo.J).style(contenidoEstilo)
+        ws.cell(index + 6, 18).string(activo.K).style(contenidoEstilo)
+        ws.cell(index + 6, 19).string(activo.L).style(contenidoEstilo)
+
+      });
+
+      //Ruta del archivo
+      const pathExcel = path.join(__dirname, 'excel', nombreArchivo + '.xlsx')
+
+      //Escribir o guardar
+      wb.write(pathExcel, async (err, stats) => {
+        if (err) {
+          console.error('Error al crear el archivo Excel', err);
+          res.status(500).send('Error al crear el archivo Excel');
+        }
+        else {
+          res.setHeader('Content-Disposition', 'attachment; filename=archivo.xlsx');
+          res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+          res.sendFile(pathExcel, (error) => {
+            if (error) {
+              console.error('Error al enviar el archivo Excel al cliente', error);
+            }
+            // Eliminar el archivo después de servirlo
+            fs.unlink(pathExcel, (unlinkError) => {
+              if (unlinkError) {
+                console.error('Error al eliminar el archivo', unlinkError);
+              } else {
+                console.log('Archivo descargado y eliminado correctamente');
+              }
+            });
+          });
+        }
+      })
+    }
   } catch (error) {
     console.log(error)
     res.status(500).send('Hubo un error')
   }
 }
 
-// export const obtenerHdepreciacionPorIdActivoGestion = async (req, res) => {
-//   try {
-//     const { gestion, id_activo } = req.body
 
-//     const hdepreciacion = await Hdepreciacion.findAll({
-//       raw: true, where: { id_activo, gestion }
-//     })
-//     res.status(200).json(hdepreciacion)
-//   } catch (error) {
-//     res.status(500).send('Hubo un error')
-//   }
-// }
 
 

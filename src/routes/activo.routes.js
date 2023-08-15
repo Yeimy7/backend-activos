@@ -25,8 +25,6 @@ router.post('/',
   ],
   activoController.crearActivo)
 router.post('/pdf', [authJwt.verifyToken], activoController.actaActivos)
-// router.post('/depreciacion/pdf', [authJwt.verifyToken], activoController.cuadroDepreciacionActivos)
-// router.post('/depreciar/pdf', [authJwt.verifyToken], activoController.depreciarActivos);
 router.post('/codigos/pdf', [authJwt.verifyToken], activoController.codigosActivos)
 router.get('/', [authJwt.verifyToken], activoController.obtenerActivos)
 router.get('/total', [authJwt.verifyToken], activoController.totalActivos)
