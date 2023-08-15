@@ -24,7 +24,7 @@ export const crearCargo = async (req, res) => {
 
 export const obtenerCargos = async (_req, res) => {
   try {
-    const cargos = await Cargo.findAll({ raw: true, where: { estado: 'A' }, attributes: { exclude: ['id_area'] }, include: Area })
+    const cargos = await Cargo.findAll({ raw: true, where: { estado: 'A' }, attributes: { exclude: ['id_area'] }, include: Area, order:['descripcion_cargo'] })
     res.status(200).json(cargos)
   } catch (error) {
     res.status(500).send('Hubo un error')

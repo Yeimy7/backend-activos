@@ -330,7 +330,8 @@ export const activosNoAsignados = async (req, res) => {
           { id_persona: { [Op.eq]: null } },
           { id_persona: { [Op.eq]: '' } }
         ]
-      }
+      },
+      order:['codigo_activo']
     })
     res.status(200).json(activos)
   } catch (error) {
@@ -848,12 +849,6 @@ export const reporteActivosPorEntidad = async (req, res) => {
           raw: true,
           where: { id_persona: activo.id_persona },
         });
-        if (!person) {
-          person = {
-            nombres: 'no tiene',
-            apellidos: 'custodio'
-          }
-        }
         return await {
           ambiente:
             activo["ambiente.tipo_ambiente"] +
@@ -863,7 +858,7 @@ export const reporteActivosPorEntidad = async (req, res) => {
           descripcion_activo: activo.descripcion_activo,
           grupo_contable: activo["grupo_contable.descripcion_g"],
           entidad: entidad.razon_social,
-          custodio: person.nombres | '' + " " + person.apellidos | '',
+          custodio: person ? person.nombres + " " + person.apellidos : '--',
         };
       })
     );

@@ -133,7 +133,7 @@ export const crearHdepreciaciones = async (req, res) => {
 }
 
 export const cuadroDepreciacion = async (req, res) => {
-  const { id_grupo, gestion, isPdf } = req.body
+  const { id_grupo, gestion, isPdf } = req.body;
   try {
 
     const hdepreciaciones = await Hdepreciacion.findAll({

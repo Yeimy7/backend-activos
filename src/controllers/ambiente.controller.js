@@ -17,7 +17,7 @@ export const crearAmbiente = async (req, res) => {
 
 export const obtenerAmbientes = async (_req, res) => {
   try {
-    const ambientes = await Ambiente.findAll()
+    const ambientes = await Ambiente.findAll({order:['tipo_ambiente']})
     res.status(200).json(ambientes)
   } catch (error) {
     res.status(500).send('Hubo un error')
