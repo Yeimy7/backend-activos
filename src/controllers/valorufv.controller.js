@@ -1,12 +1,13 @@
-import { validationResult } from 'express-validator'
 import { Sequelize } from 'sequelize'
+import { validationResult } from 'express-validator'
 import ValorUfv from '../models/ValorUfv'
 
 export const crearValorUfv = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { gestion, valor } = req.body;
   try {
@@ -16,8 +17,7 @@ export const crearValorUfv = async (req, res) => {
 
     res.status(201).json(resultado)
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: 'Hubo un error al intentar registrar el valor ufv' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const obtenerValoresUfv = async (_req, res) => {
@@ -25,7 +25,7 @@ export const obtenerValoresUfv = async (_req, res) => {
     const valoresUfv = await ValorUfv.findAll()
     res.status(200).json(valoresUfv)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los valores ufv' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -36,7 +36,7 @@ export const obtenerValorUfvPorId = async (req, res) => {
     })
     res.status(200).json(valorUfv)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -49,7 +49,7 @@ export const obtenerValorUfvPorGestion = async (req, res) => {
     })
     res.status(200).json(valorUfv)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -61,17 +61,17 @@ export const obtenerUltimaGestion = async (_req, res) => {
     })
     res.status(200).json(valorUfv[0])
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
 export const obtenerGestiones = async (_req, res) => {
   try {
     const gestiones = await ValorUfv.findAll({
-      raw: true, attributes: ['gestion'], order:['gestion']
+      raw: true, attributes: ['gestion'], order: ['gestion']
     })
     res.status(200).json(gestiones)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }

@@ -33,6 +33,11 @@ const User = conexion.define('usuario', {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW
   },
+  estado: {
+    type: Sequelize.STRING,
+    defaultValue: 'A',
+    allowNull: false
+  },
   id_rol: {
     type: Sequelize.UUID,
     allowNull: false,

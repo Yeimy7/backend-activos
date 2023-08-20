@@ -1,14 +1,10 @@
 import express from 'express'
-import { createAmbiente, createAuxiliar, createEdificio, createGrupoContable, createPiso, createRoles } from './utils/initialSetup'
+import { createGrupoContable, createPiso, createRoles } from './utils/initialSetup'
 const app = express()
 // createRoles()
 // createGrupoContable()
 // createAuxiliar()
-// createEdificio()
-// createPiso()
-// createAmbiente()
 import cors from 'cors'
-import assetsRoutes from './routes/assets.routes'
 import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
 import proveedorRoutes from './routes/proveedor.routes'
@@ -37,7 +33,6 @@ app.use(express.static('build'))
 app.use(express.static('public'));
 app.use(express.json())
 app.use(middleware.requestLogger)
-app.use('/api/assets', assetsRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/proveedores', proveedorRoutes)

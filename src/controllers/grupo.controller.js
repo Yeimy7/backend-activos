@@ -6,7 +6,7 @@ export const obtenerGrupos = async (_req, res) => {
     const grupos = await GrupoContable.findAll()
     res.status(200).json(grupos)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -20,13 +20,11 @@ export const obtenerTotalPorGrupos = async (_req, res) => {
         ]
     })
     const allDataGroups = await Promise.all(grupos.map(async grupo => {
-      const total = await Activo.count({ where: { id_grupo: grupo.id_grupo, estado: 'A' }})
+      const total = await Activo.count({ where: { id_grupo: grupo.id_grupo, estado: 'A' } })
       return await { ...grupo, total }
     }))
-    // res.status(200).json(grupos)
     res.status(200).json(allDataGroups)
   } catch (error) {
-    // res.status(500).send('Hubo un error')
-    res.status(500).json({ msg: 'No se pudo encontrar el total' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }

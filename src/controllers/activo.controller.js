@@ -1,11 +1,9 @@
-import path from 'path'
 import fs from 'fs-extra'
+import path from 'path'
 import xl from 'excel4node'
-import { validationResult } from 'express-validator'
-import { Op } from 'sequelize'
 import { crearPDF } from '../utils/generarPDF'
-import { calculoDepreciacionActivoMes } from '../utils/calculoDepreciacion'
-import { depreciacion } from '../utils/cuadroDepreciacion'
+import { Op } from 'sequelize'
+import { validationResult } from 'express-validator'
 import Activo from '../models/Activo'
 import Ambiente from '../models/Ambiente'
 import Area from '../models/Area'
@@ -14,29 +12,30 @@ import Cargo from '../models/Cargo'
 import Edificio from '../models/Edificio'
 import Empleado from '../models/Empleado'
 import GrupoContable from '../models/GrupoContable'
-import Proveedor from '../models/Proveedor'
 import Person from '../models/Person'
 import Piso from '../models/Piso'
+import Proveedor from '../models/Proveedor'
 
 export const crearActivo = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { codigo_activo, fecha_ingreso, descripcion_activo, costo, dep_acumulada, valor_residual, indice_ufv, img_activo, codigo_ambiente, descripcion_aux, descripcion_g, razon_social } = req.body
   try {
     const ambiente = await Ambiente.findOne({ where: { codigo_ambiente: codigo_ambiente } })
-    if (!ambiente) return res.status(404).json({ msg: 'Ambiente no encontrado' })
+    if (!ambiente) return res.status(404).json({ msg: 'Ambiente no encontrado', type: 'error' })
 
     const auxiliar = await Auxiliar.findOne({ where: { descripcion_aux: descripcion_aux } })
-    if (!auxiliar) return res.status(404).json({ msg: 'Auxiliar no encontrado' })
+    if (!auxiliar) return res.status(404).json({ msg: 'Auxiliar no encontrado', type: 'error' })
 
     const grupo = await GrupoContable.findOne({ where: { descripcion_g: descripcion_g } })
-    if (!grupo) return res.status(404).json({ msg: 'Grupo contable no encontrado' })
+    if (!grupo) return res.status(404).json({ msg: 'Grupo contable no encontrado', type: 'error' })
 
     const proveedor = await Proveedor.findOne({ where: { razon_social: razon_social } })
-    if (!proveedor) return res.status(404).json({ msg: 'Proveedor no encontrado' })
+    if (!proveedor) return res.status(404).json({ msg: 'Entidad no encontrada', type: 'error' })
 
     const newActivo = {
       codigo_activo,
@@ -63,8 +62,7 @@ export const crearActivo = async (req, res) => {
       'proveedor.razon_social': proveedor.razon_social
     })
   } catch (error) {
-    console.log('---->', error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -93,8 +91,7 @@ export const obtenerActivos = async (_req, res) => {
     })
     res.status(200).json(activos)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -122,8 +119,7 @@ export const obtenerActivoPorId = async (req, res) => {
     })
     res.status(200).json(activo)
   } catch (error) {
-    console.log('---->', error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -188,8 +184,7 @@ export const obtenerActivoPorCodigo = async (req, res) => {
 
     res.status(200).json(activo)
   } catch (error) {
-    console.log('---->', error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -202,7 +197,7 @@ export const actualizarActivoPorId = async (req, res) => {
     let isModified = false
     // Si el proyecto existe o no
     if (!activo) {
-      return res.status(404).json({ msg: 'Activo no encontrado' })
+      return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
     }
     if (fecha_ingreso && fecha_ingreso !== activo.fecha_ingreso) {
       activo.fecha_ingreso = fecha_ingreso
@@ -224,7 +219,7 @@ export const actualizarActivoPorId = async (req, res) => {
     }
     res.status(200).json(activoActualizado)
   } catch (error) {
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -233,14 +228,14 @@ export const bajaActivoPorId = async (req, res) => {
     let activo = await Activo.findByPk(req.params.activoId)
 
     if (!activo) {
-      return res.status(404).json({ msg: 'Activo no encontrado' })
+      return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
     }
     activo.estado = 'I'
     const bajaActivo = await activo.save()
     res.status(200).json(bajaActivo)
   } catch (error) {
     console.log(error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -250,37 +245,36 @@ export const actualizarImagenActivoPorId = async (req, res) => {
     // Revisar el ID
     let activo = await Activo.findByPk(req.params.activoId)
     if (!activo) {
-      return res.status(400).json({ msg: 'El activo no existe' })
+      return res.status(400).json({ msg: 'El activo no existe', type: 'error' })
     }
 
     if (activo.img_activo) {
       await fs.unlink(path.resolve(activo.img_activo))
     }
-    console.log(req.file)
     activo.img_activo = req.file.path
     const result = await activo.save()
     res.status(200).json(result)
   } catch (error) {
-    console.log('-------> ', error);
-    res.status(500).json({ msg: 'Error en el servidor' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
 export const asignarActivo = async (req, res) => {
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { id_activo, id_persona } = req.body
   try {
     // Revisar el ID
     let activo = await Activo.findByPk(id_activo)
     if (!activo) {
-      return res.status(404).json({ msg: 'Activo no encontrado' })
+      return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
     }
     let empleado = await Empleado.findByPk(id_persona)
     if (!empleado) {
-      return res.status(404).json({ msg: 'Empleado no encontrado' })
+      return res.status(404).json({ msg: 'Empleado no encontrado', type: 'error' })
     }
     const date = new Date()
 
@@ -297,8 +291,7 @@ export const asignarActivo = async (req, res) => {
       }
     )
   } catch (error) {
-    console.log('------>', error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -318,11 +311,10 @@ export const activosAsignados = async (req, res) => {
     }))
     res.status(200).json(allDataActivos)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
-export const activosNoAsignados = async (req, res) => {
+export const activosNoAsignados = async (_req, res) => {
   try {
     const activos = await Activo.findAll({
       raw: true, where: {
@@ -331,12 +323,11 @@ export const activosNoAsignados = async (req, res) => {
           { id_persona: { [Op.eq]: '' } }
         ]
       },
-      order:['codigo_activo']
+      order: ['codigo_activo']
     })
     res.status(200).json(activos)
   } catch (error) {
-    console.log('-------->', error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -346,7 +337,7 @@ export const desvincularActivo = async (req, res) => {
     // Revisar el ID
     let activo = await Activo.findByPk(id_activo)
     if (!activo) {
-      return res.status(404).json({ msg: 'Activo no encontrado' })
+      return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
     }
 
     activo.fecha_asig_empleado = null
@@ -356,7 +347,7 @@ export const desvincularActivo = async (req, res) => {
 
     res.status(200).json(activoAsignado)
   } catch (error) {
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -370,11 +361,11 @@ export const trasladarActivo = async (req, res) => {
     // Revisar el ID
     let activo = await Activo.findByPk(id_activo)
     if (!activo) {
-      return res.status(404).json({ msg: 'Activo no encontrado' })
+      return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
     }
     let ambiente = await Ambiente.findByPk(id_ambiente)
     if (!ambiente) {
-      return res.status(404).json({ msg: 'Ambiente no encontrado' })
+      return res.status(404).json({ msg: 'Ambiente no encontrado', type: 'error' })
     }
     const date = new Date()
 
@@ -390,8 +381,7 @@ export const trasladarActivo = async (req, res) => {
       }
     )
   } catch (error) {
-    console.log('------>', error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -415,19 +405,18 @@ export const actaActivos = async (_req, res) => {
         ...activo,
         num: index + 1,
         tipo_codigo_ambiente: `${activo['ambiente.tipo_ambiente']} ${activo['ambiente.codigo_ambiente']}`,
-        grupo:activo['grupo_contable.descripcion_g'] ,
+        grupo: activo['grupo_contable.descripcion_g'],
       }
     })
     const pdf = await crearPDF('listaActivos', itemsActivos)
     res.contentType('application/pdf');
     res.status(200).send(pdf)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
-export const listaActivosExcel = async (req, res) => {
+export const listaActivosExcel = async (_req, res) => {
 
   // Fecha
   let date = new Date()
@@ -505,15 +494,14 @@ export const listaActivosExcel = async (req, res) => {
     //Escribir o guardar
     wb.write(pathExcel, async (err, stats) => {
       if (err) {
-        console.error('Error al crear el archivo Excel', err);
-        res.status(500).send('Error al crear el archivo Excel');
+        res.status(500).json({ msg: 'Error al crear el archivo Excel', type: 'error' })
       }
       else {
         res.setHeader('Content-Disposition', 'attachment; filename=archivo.xlsx');
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.sendFile(pathExcel, (error) => {
           if (error) {
-            console.error('Error al enviar el archivo Excel al cliente', error);
+            res.status(500).json({ msg: 'Error al enviar el archivo Excel al cliente', type: 'error' })
           }
           // Eliminar el archivo después de servirlo
           fs.unlink(pathExcel, (unlinkError) => {
@@ -527,8 +515,7 @@ export const listaActivosExcel = async (req, res) => {
       }
     })
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -581,8 +568,7 @@ export const actaAsignacionActivo = async (req, res) => {
     res.contentType('application/pdf');
     res.status(200).send(pdf)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -601,8 +587,7 @@ export const codigosActivos = async (req, res) => {
     res.contentType('application/pdf');
     res.status(200).send(pdf)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -652,8 +637,7 @@ export const activosPorCustodio = async (req, res) => {
     }))
     res.status(200).json(allDataActivos)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -704,8 +688,7 @@ export const activosPorGrupo = async (req, res) => {
     }))
     res.status(200).json(allDataActivos)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -756,8 +739,7 @@ export const activosPorEntidad = async (req, res) => {
     }))
     res.status(200).json(allDataActivos)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -773,9 +755,7 @@ export const totalAsignados = async (_req, res) => {
     })
     res.status(200).json(totalActivos)
   } catch (error) {
-    console.log(error)
-    // res.status(500).send('Hubo un error')
-    res.status(500).json({ msg: 'No se pudo encontrar el total' })
+    res.status(500).json({ msg: 'No se pudo encontrar el total', type: 'error' })
   }
 }
 
@@ -788,16 +768,9 @@ export const totalActivos = async (_req, res) => {
     })
     res.status(200).json(totalActivos)
   } catch (error) {
-    console.log(error)
-    // res.status(500).send('Hubo un error')
-    res.status(500).json({ msg: 'No se pudo encontrar el total' })
+    res.status(500).json({ msg: 'No se pudo encontrar el total', type: 'error' })
   }
 }
-
-
-/*
- ******************************************************************************************** 
- */
 
 export const reporteActivosPorEntidad = async (req, res) => {
   try {
@@ -867,8 +840,7 @@ export const reporteActivosPorEntidad = async (req, res) => {
     res.contentType("application/pdf");
     res.status(200).send(pdf);
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Hubo un error");
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 };
 
@@ -936,8 +908,7 @@ export const reporteActivosPorCustodio = async (req, res) => {
     res.contentType("application/pdf");
     res.status(200).send(pdf);
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Hubo un error");
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 };
 
@@ -1004,7 +975,6 @@ export const reporteActivosPorGrupo = async (req, res) => {
     res.contentType("application/pdf");
     res.status(200).send(pdf);
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Hubo un error");
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 };

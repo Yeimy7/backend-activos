@@ -1,15 +1,15 @@
-import Person from '../models/Person'
-import User from '../models/User'
-import Area from '../models/Area'
 import { validationResult } from 'express-validator'
+import Area from '../models/Area'
 import Cargo from '../models/Cargo'
 import Empleado from '../models/Empleado'
+import Person from '../models/Person'
 
 export const crearEmpleado = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { ci, nombres, apellidos, fecha_incorporacion, descripcion_cargo } = req.body
   try {
@@ -25,7 +25,6 @@ export const crearEmpleado = async (req, res) => {
 
     //Guardar el usuario
     const cargo = await Cargo.findOne({ raw: true, where: { descripcion_cargo: descripcion_cargo }, include: Area })
-    console.log(cargo)
     const newEmpleado = {
       id_persona: idPersona,
       fecha_incorporacion,
@@ -35,8 +34,7 @@ export const crearEmpleado = async (req, res) => {
 
     res.status(201).json({ id_persona: idPersona, nombres, apellidos, ci, fecha_incorporacion, "cargo.descripcion_cargo": descripcion_cargo, "cargo.area.nombre_area": cargo['area.nombre_area'] })
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: 'Hubo un error al intentar registrar al empleado' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const obtenerEmpleados = async (_req, res) => {
@@ -49,7 +47,7 @@ export const obtenerEmpleados = async (_req, res) => {
     }))
     res.status(200).json(datosEmpleados)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los empleados' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -60,7 +58,7 @@ export const obtenerEmpleadoPorId = async (req, res) => {
     const datosEmpleado = await { ...persona, ...empleado }
     res.status(200).json(datosEmpleado)
   } catch (error) {
-    res.status(500).send('Hubo un errorr')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -73,7 +71,7 @@ export const actualizarEmpleadoPorId = async (req, res) => {
     let isModified = false
     // Si el proyecto existe o no
     if (!empleado) {
-      return res.status(404).json({ msg: 'Empleado no encontrado' })
+      return res.status(404).json({ msg: 'Empleado no encontrado', type: 'error' })
     }
 
     if (fecha_incorporacion && fecha_incorporacion !== empleado.fecha_incorporacion) {
@@ -96,8 +94,7 @@ export const actualizarEmpleadoPorId = async (req, res) => {
     }
     res.status(200).json(empleadoActualizado)
   } catch (error) {
-    console.log('---->', error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -106,14 +103,13 @@ export const bajaEmpleadoPorId = async (req, res) => {
     const empleado = await Empleado.findByPk(req.params.empleadoId)
 
     if (!empleado) {
-      return res.status(404).json({ msg: 'Empleado no encontrado' })
+      return res.status(404).json({ msg: 'Empleado no encontrado', type: 'error' })
     }
     empleado.estado = 'I'
     const bajaEmpleado = await empleado.save()
     res.status(200).json(bajaEmpleado)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const totalEmpleados = async (_req, res) => {
@@ -123,6 +119,6 @@ export const totalEmpleados = async (_req, res) => {
     });
     res.status(200).json(totalEmpleados)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los empleados' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }

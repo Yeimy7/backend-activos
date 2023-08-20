@@ -1,12 +1,13 @@
-import Cargo from '../models/Cargo'
-import Area from '../models/Area'
 import { validationResult } from 'express-validator'
+import Area from '../models/Area'
+import Cargo from '../models/Cargo'
 
 export const crearCargo = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { descripcion_cargo, nombre_area } = req.body
   try {
@@ -18,26 +19,25 @@ export const crearCargo = async (req, res) => {
 
     res.status(201).json({ id_cargo: cargoCreado.id_cargo, descripcion_cargo, "area.nombre_area": nombre_area })
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
 export const obtenerCargos = async (_req, res) => {
   try {
-    const cargos = await Cargo.findAll({ raw: true, where: { estado: 'A' }, attributes: { exclude: ['id_area'] }, include: Area, order:['descripcion_cargo'] })
+    const cargos = await Cargo.findAll({ raw: true, where: { estado: 'A' }, attributes: { exclude: ['id_area'] }, include: Area, order: ['descripcion_cargo'] })
     res.status(200).json(cargos)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
 export const obtenerCargoPorId = async (req, res) => {
   try {
-    const cargo = await Cargo.findOne({ raw:true, where: { id_cargo: req.params.cargoId }, attributes: { exclude: ['id_cargo'] }, include:Area })
+    const cargo = await Cargo.findOne({ raw: true, where: { id_cargo: req.params.cargoId }, attributes: { exclude: ['id_cargo'] }, include: Area })
     res.status(200).json(cargo)
   } catch (error) {
-    console.log('---->', error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -50,7 +50,7 @@ export const actualizarCargoPorId = async (req, res) => {
     let isModified = false
     // Si el proyecto existe o no
     if (!cargo) {
-      return res.status(404).json({ msg: 'Cargo no encontrado' })
+      return res.status(404).json({ msg: 'Cargo no encontrado', type: 'error' })
     }
     if (descripcion_cargo && descripcion_cargo !== cargo.descripcion_cargo) {
       cargo.descripcion_cargo = descripcion_cargo
@@ -64,7 +64,7 @@ export const actualizarCargoPorId = async (req, res) => {
     }
     res.status(200).json(cargoActualizado)
   } catch (error) {
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -73,13 +73,12 @@ export const bajaCargoPorId = async (req, res) => {
     let cargo = await Cargo.findByPk(req.params.cargoId)
 
     if (!cargo) {
-      return res.status(404).json({ msg: 'Cargo no encontrado' })
+      return res.status(404).json({ msg: 'Cargo no encontrado', type: 'error' })
     }
     cargo.estado = 'I'
     const bajaCargo = await cargo.save()
     res.status(200).json(bajaCargo)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }

@@ -1,28 +1,29 @@
-import Person from '../models/Person'
-import Devolucion from '../models/Devolucion'
-import Activo from '../models/Activo'
-import Empleado from '../models/Empleado'
+import { crearPDF } from '../utils/generarPDF'
 import { validationResult } from 'express-validator'
-import Cargo from '../models/Cargo'
+import Activo from '../models/Activo'
 import Ambiente from '../models/Ambiente'
 import Auxiliar from '../models/Auxiliar'
+import Cargo from '../models/Cargo'
+import Devolucion from '../models/Devolucion'
+import Empleado from '../models/Empleado'
 import GrupoContable from '../models/GrupoContable'
-import { crearPDF } from '../utils/generarPDF'
+import Person from '../models/Person'
 
 export const crearDevolucion = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { motivo_devolucion, fecha_asignacion, id_activo, id_persona } = req.body
   try {
     //Guardar datos de Devolucion
     const activo = await Activo.findOne({ raw: true, where: { id_activo: id_activo } })
-    if (!activo) return res.status(404).json({ msg: 'Activo no encontrado' })
+    if (!activo) return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
 
     const empleado = await Empleado.findOne({ where: { id_persona: id_persona } })
-    if (!empleado) return res.status(404).json({ msg: 'Empleado no encontrado' })
+    if (!empleado) return res.status(404).json({ msg: 'Empleado no encontrado', type: 'error' })
 
     const persona = await Person.findOne({ where: { id_persona: id_persona } })
 
@@ -46,8 +47,7 @@ export const crearDevolucion = async (req, res) => {
       'empleado.apellidos': persona.apellidos
     })
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: 'Hubo un error al intentar registrar devolucion' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const obtenerDevoluciones = async (_req, res) => {
@@ -65,7 +65,7 @@ export const obtenerDevoluciones = async (_req, res) => {
     }))
     res.status(200).json(datosDevoluciones)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los devoluciones' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -82,7 +82,7 @@ export const obtenerDevolucionPorId = async (req, res) => {
     const datosDevolucion = await { 'empleado.nombres': persona.nombres, 'empleado.apellidos': persona.apellidos, ...devolucion }
     res.status(200).json(datosDevolucion)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -135,7 +135,6 @@ export const actaDevolucionActivo = async (req, res) => {
     res.contentType('application/pdf');
     res.status(200).send(pdf)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }

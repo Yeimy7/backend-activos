@@ -1,27 +1,28 @@
-import Baja from '../models/Baja'
-import Person from '../models/Person'
-import Activo from '../models/Activo'
-import Empleado from '../models/Empleado'
+import { crearPDF } from '../utils/generarPDF'
 import { validationResult } from 'express-validator'
-import Cargo from '../models/Cargo'
+import Activo from '../models/Activo'
 import Ambiente from '../models/Ambiente'
 import Auxiliar from '../models/Auxiliar'
+import Baja from '../models/Baja'
+import Cargo from '../models/Cargo'
+import Empleado from '../models/Empleado'
 import GrupoContable from '../models/GrupoContable'
-import { crearPDF } from '../utils/generarPDF'
+import Person from '../models/Person'
 
 export const crearBaja = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { motivo_baja, id_activo } = req.body
   try {
     //Guardar datos de Baja
     const activo = await Activo.findOne({ raw: true, where: { id_activo: id_activo } })
-    if (!activo) return res.status(404).json({ msg: 'Activo no encontrado' })
+    if (!activo) return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
 
-    if (activo.id_persona) return res.status(406).json({ msg: 'Debe desvincular el activo para poder dar baja' })
+    if (activo.id_persona) return res.status(406).json({ msg: 'Debe desvincular el activo para poder dar baja', type: 'error' })
 
     const newBaja = {
       motivo_baja,
@@ -37,8 +38,7 @@ export const crearBaja = async (req, res) => {
       'activo.descripcion_activo': activo.descripcion_activo,
     })
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: 'Hubo un error al intentar registrar baja' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const obtenerBajas = async (_req, res) => {
@@ -51,7 +51,7 @@ export const obtenerBajas = async (_req, res) => {
     })
     res.status(200).json(bajas)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los bajas' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -66,7 +66,7 @@ export const obtenerBajaPorId = async (req, res) => {
     })
     res.status(200).json(baja)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const actaBajaActivo = async (req, res) => {
@@ -110,8 +110,7 @@ export const actaBajaActivo = async (req, res) => {
     res.contentType('application/pdf');
     res.status(200).send(pdf)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -120,6 +119,6 @@ export const totalBajas = async (_req, res) => {
     const totalBajas = await Baja.count()
     res.status(200).json(totalBajas)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los bajas' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }

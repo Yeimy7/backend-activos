@@ -1,26 +1,27 @@
-import Ambiente from '../models/Ambiente'
 import { validationResult } from 'express-validator'
+import Ambiente from '../models/Ambiente'
 
 export const crearAmbiente = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   try {
     const ambienteCreado = await Ambiente.create(req.body)
     res.status(201).json(ambienteCreado)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
 export const obtenerAmbientes = async (_req, res) => {
   try {
-    const ambientes = await Ambiente.findAll({order:['tipo_ambiente']})
+    const ambientes = await Ambiente.findAll({ where: { estado: 'A' }, order: ['tipo_ambiente'] })
     res.status(200).json(ambientes)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -30,7 +31,7 @@ export const obtenerAmbientePorId = async (req, res) => {
     const ambiente = await Ambiente.findOne({ where: { id_ambiente: req.params.ambienteId } })
     res.status(200).json(ambiente)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -43,7 +44,7 @@ export const actualizarAmbientePorId = async (req, res) => {
     let isModified = false
     // Si el ambiente existe o no
     if (!ambiente) {
-      return res.status(404).json({ msg: 'Ambiente no encontrado' })
+      return res.status(404).json({ msg: 'Ambiente no encontrado', type: 'error' })
     }
     if (codigo_ambiente && codigo_ambiente !== ambiente.codigo_ambiente) {
       ambiente.codigo_ambiente = codigo_ambiente
@@ -61,7 +62,7 @@ export const actualizarAmbientePorId = async (req, res) => {
     }
     res.status(200).json(ambienteActualizado)
   } catch (error) {
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -70,14 +71,14 @@ export const bajaAmbientePorId = async (req, res) => {
     let ambiente = await Ambiente.findByPk(req.params.ambienteId)
 
     if (!ambiente) {
-      return res.status(404).json({ msg: 'Ambiente no encontrado' })
+      return res.status(404).json({ msg: 'Ambiente no encontrado', type: 'error' })
     }
     ambiente.estado = 'I'
     const bajaAmbiente = await ambiente.save()
     res.status(200).json(bajaAmbiente)
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Error en el servidor')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
+
   }
 }
 
@@ -86,6 +87,7 @@ export const obtenerAmbientesPorPiso = async (req, res) => {
     const ambientes = await Ambiente.findAll({ where: { estado: 'A', id_piso: req.params.pisoId } })
     res.status(200).json(ambientes)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
+
   }
 }

@@ -1,39 +1,39 @@
 import path from 'path'
 import fs from 'fs-extra'
 import xl from 'excel4node'
-import { validationResult } from 'express-validator'
-import { Op, Sequelize } from 'sequelize'
-import { depreciacion } from '../utils/cuadroDepreciacion'
 import { crearPDF } from '../utils/generarPDF'
-import Hdepreciacion from '../models/HDepreciacion'
+import { depreciacion } from '../utils/cuadroDepreciacion'
+import { Op } from 'sequelize'
+import { validationResult } from 'express-validator'
 import Activo from '../models/Activo'
-import ValorUfv from '../models/ValorUfv'
 import Auxiliar from '../models/Auxiliar'
 import GrupoContable from '../models/GrupoContable'
+import Hdepreciacion from '../models/HDepreciacion'
 import Proveedor from '../models/Proveedor'
+import ValorUfv from '../models/ValorUfv'
 
 export const crearHdepreciacion = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { valor_residual, id_activo, id_valor_ufv } = req.body
   try {
     //Guardar datos del historial de depreciacion
     const activo = await Activo.findOne({ raw: true, where: { id_activo: id_activo } })
-    if (!activo) return res.status(404).json({ msg: 'Activo no encontrado' })
+    if (!activo) return res.status(404).json({ msg: 'Activo no encontrado', type: 'error' })
 
     const valor_ufv = await ValorUfv.findOne({ raw: true, where: { id_valor_ufv: id_valor_ufv } })
-    if (!valor_ufv) return res.status(404).json({ msg: 'Valor UFV no encontrado' })
+    if (!valor_ufv) return res.status(404).json({ msg: 'Valor UFV no encontrado', type: 'error' })
 
     //Guardar el datos de depreciacion y actualizar el activo
     const resultado = await Hdepreciacion.create({ valor_residual, id_activo, id_valor_ufv })
 
     res.status(201).json(resultado)
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: 'Hubo un error al intentar registrar la hdepreciacion' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const obtenerHDepreciaciones = async (_req, res) => {
@@ -53,7 +53,7 @@ export const obtenerHDepreciaciones = async (_req, res) => {
     })
     res.status(200).json(hdepreciaciones)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los historicos de depreciacion' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -74,7 +74,7 @@ export const obtenerHdepreciacionPorId = async (req, res) => {
     })
     res.status(200).json(hdepreciacion)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -87,7 +87,7 @@ export const obtenerHdepreciacionPorIdActivo = async (req, res) => {
     })
     res.status(200).json(hdepreciacion)
   } catch (error) {
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -125,10 +125,9 @@ export const crearHdepreciaciones = async (req, res) => {
       await Hdepreciacion.create({ valor_residual: (ajusteActualizacion + valor_residual), id_activo, id_valor_ufv: valorUfv[0].id_valor_ufv })
       return
     }))
-    res.status(200).json({ msj: 'Depreciaciones realizadas exitosamente' })
+    res.status(200).json({ msj: 'Depreciaciones realizadas exitosamente', type: 'success' })
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ msj: 'Hubo un error al intentar registrar la hdepreciacion' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 
@@ -307,9 +306,6 @@ export const cuadroDepreciacion = async (req, res) => {
       ws.cell(5, 18).string('Actualizada').style(columnaEstilo)
       ws.cell(5, 19).string('Actualizado').style(columnaEstilo)
 
-
-
-
       itemsActivos.forEach((activo, index) => {
         ws.cell(index + 6, 1).string(valores.grupo_contable).style(contenidoEstilo)
         ws.cell(index + 6, 2).string(activo.codigo).style(contenidoEstilo)
@@ -324,12 +320,11 @@ export const cuadroDepreciacion = async (req, res) => {
         ws.cell(index + 6, 12).string(activo.F).style(contenidoEstilo)
         ws.cell(index + 6, 13).string(activo.G).style(contenidoEstilo)
         ws.cell(index + 6, 14).string(activo.H).style(contenidoEstilo)
-        ws.cell(index + 6, 15).string((Number(activo.H)*12).toFixed(2)).style(contenidoEstilo)
+        ws.cell(index + 6, 15).string((Number(activo.H) * 12).toFixed(2)).style(contenidoEstilo)
         ws.cell(index + 6, 16).string(activo.I).style(contenidoEstilo)
         ws.cell(index + 6, 17).string(activo.J).style(contenidoEstilo)
         ws.cell(index + 6, 18).string(activo.K).style(contenidoEstilo)
         ws.cell(index + 6, 19).string(activo.L).style(contenidoEstilo)
-
       });
 
       //Ruta del archivo
@@ -338,15 +333,14 @@ export const cuadroDepreciacion = async (req, res) => {
       //Escribir o guardar
       wb.write(pathExcel, async (err, stats) => {
         if (err) {
-          console.error('Error al crear el archivo Excel', err);
-          res.status(500).send('Error al crear el archivo Excel');
+          res.status(500).json({ msg: 'Error al crear el archivo Excel', type: 'error' });
         }
         else {
           res.setHeader('Content-Disposition', 'attachment; filename=archivo.xlsx');
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
           res.sendFile(pathExcel, (error) => {
             if (error) {
-              console.error('Error al enviar el archivo Excel al cliente', error);
+              res.status(500).json({ msg: 'Error al enviar el archivo Excel al cliente', type: 'error' })
             }
             // Eliminar el archivo después de servirlo
             fs.unlink(pathExcel, (unlinkError) => {
@@ -361,8 +355,7 @@ export const cuadroDepreciacion = async (req, res) => {
       })
     }
   } catch (error) {
-    console.log(error)
-    res.status(500).send('Hubo un error')
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 

@@ -1,15 +1,14 @@
-import Person from '../models/Person'
-import User from '../models/User'
-import Role from '../models/Role'
-// import jwt from 'jsonwebtoken'
-// import { WORD_SECRET } from '../config/config'
 import { validationResult } from 'express-validator'
+import Person from '../models/Person'
+import Role from '../models/Role'
+import User from '../models/User'
 
 export const createUser = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() })
+    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { ci, nombres, apellidos, telefono, email, password, adicional, avatar } = req.body
   try {
@@ -27,13 +26,12 @@ export const createUser = async (req, res) => {
 
     res.status(201).json({ id_persona: registeredPerson.id_persona, nombres, apellidos, ci, telefono, email, adicional: null, avatar: null, "rol.nombre_rol": "Custodio" })
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: 'Hubo un error al intentar registrar al usuario' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const getUsers = async (_req, res) => {
   try {
-    const users = await User.findAll({ raw: true, attributes: { exclude: ['password', 'id_rol'] }, include: Role })
+    const users = await User.findAll({ raw: true, attributes: { exclude: ['password', 'id_rol'] }, include: Role,  where: { estado: 'A' } })
     const allDataUsers = await Promise.all(users.map(async user => {
       const person = await Person.findOne({ raw: true, where: { id_persona: user.id_persona } })
       return await { ...person, ...user }
@@ -41,7 +39,7 @@ export const getUsers = async (_req, res) => {
     }))
     res.json(allDataUsers)
   } catch (error) {
-    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los usuarios' })
+    res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
 export const ascendUser = async (req, res) => {
@@ -52,7 +50,7 @@ export const ascendUser = async (req, res) => {
 
   try {
     const user = await User.findOne({ where: { id_persona: req.params.id } })
-    if (!user) return res.status(404).json({ msg: 'Usuario no encontrado' })
+    if (!user) return res.status(404).json({ msg: 'Usuario no encontrado', type: 'error' })
 
     // Buscar el rol Administrador
     const rol = await Role.findOne({ where: { nombre_rol: 'Administrador' } })
@@ -60,11 +58,10 @@ export const ascendUser = async (req, res) => {
     // newUser.id_rol = rol.id_rol
     // console.log(user)
     await user.save()
-    res.status(201).json({ msg: 'Rol modificado a Administrador' })
+    res.status(201).json({ msg: 'Rol modificado a Administrador', type: 'success' })
 
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: 'Error en el servidor' })
+    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los usuarios' })
   }
 }
 export const descendUser = async (req, res) => {
@@ -75,7 +72,7 @@ export const descendUser = async (req, res) => {
 
   try {
     const user = await User.findOne({ where: { id_persona: req.params.id } })
-    if (!user) return res.status(404).json({ msg: 'Usuario no encontrado' })
+    if (!user) return res.status(404).json({ msg: 'Usuario no encontrado', type: 'error' })
 
     // Buscar el rol Administrador
     const rol = await Role.findOne({ where: { nombre_rol: 'Custodio' } })
@@ -83,11 +80,10 @@ export const descendUser = async (req, res) => {
     // newUser.id_rol = rol.id_rol
     // console.log(user)
     await user.save()
-    res.status(201).json({ msg: 'Rol modificado a Usuario' })
+    res.status(201).json({ msg: 'Rol modificado a Custodio', type: 'success' })
 
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: 'Error en el servidor' })
+    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los usuarios' })
   }
 }
 
@@ -96,14 +92,13 @@ export const deleteUserById = async (req, res) => {
     let user = await User.findByPk(req.params.userId)
 
     if (!user) {
-      return res.status(404).json({ msg: 'Usuario no encontrado' })
+      return res.status(404).json({ msg: 'Usuario no encontrado', type: 'error' })
     }
-
-    await User.destroy({ where: { id_persona: req.params.userId } })
-    res.json({ msg: 'usuario eliminado correctamente' })
+    user.estado = 'I'
+    await user.save()
+    res.json({ msg: 'Usuario eliminado correctamente', type: 'success' })
 
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ msg: 'Error al intentar eliminar al usuario' })
+    res.status(500).json({ msg: 'Hubo un error al recuperar datos de los usuarios' })
   }
 }
