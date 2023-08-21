@@ -20,10 +20,10 @@ export const crearActivo = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    let err = errores.errors.map(mensaje => (mensaje.msg))
     return res.status(400).json({ msg: err.join(), type: 'error' })
   }
-  const { codigo_activo, fecha_ingreso, descripcion_activo, costo, dep_acumulada, valor_residual, indice_ufv, img_activo, codigo_ambiente, descripcion_aux, descripcion_g, razon_social } = req.body
+  const { codigo_activo, fecha_ingreso, descripcion_activo, costo, valor_residual, indice_ufv, img_activo, codigo_ambiente, descripcion_aux, descripcion_g, razon_social } = req.body
   try {
     const ambiente = await Ambiente.findOne({ where: { codigo_ambiente: codigo_ambiente } })
     if (!ambiente) return res.status(404).json({ msg: 'Ambiente no encontrado', type: 'error' })
@@ -42,7 +42,6 @@ export const crearActivo = async (req, res) => {
       fecha_ingreso,
       descripcion_activo,
       costo,
-      dep_acumulada,
       valor_residual,
       indice_ufv,
       img_activo,

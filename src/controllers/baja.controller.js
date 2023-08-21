@@ -13,7 +13,7 @@ export const crearBaja = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    let err = errores.errors.map(mensaje => (mensaje.msg))
     return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { motivo_baja, id_activo } = req.body

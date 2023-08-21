@@ -11,7 +11,7 @@ export const crearTraslado = async (req, res) => {
   // Revisar si hay errores
   const errores = validationResult(req)
   if (!errores.isEmpty()) {
-    let err = x.errores.errors.map(mensaje => (mensaje.msg))
+    let err = errores.errors.map(mensaje => (mensaje.msg))
     return res.status(400).json({ msg: err.join(), type: 'error' })
   }
   const { motivo_traslado, fecha_ocupacion_anterior, id_activo, id_ambiente } = req.body
