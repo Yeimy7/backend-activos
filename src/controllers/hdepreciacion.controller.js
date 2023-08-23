@@ -3,7 +3,7 @@ import fs from 'fs-extra'
 import xl from 'excel4node'
 import { crearPDF } from '../utils/generarPDF'
 import { depreciacion } from '../utils/cuadroDepreciacion'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { validationResult } from 'express-validator'
 import Activo from '../models/Activo'
 import Auxiliar from '../models/Auxiliar'
@@ -36,6 +36,7 @@ export const crearHdepreciacion = async (req, res) => {
     res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
+
 export const obtenerHDepreciaciones = async (_req, res) => {
   try {
     const hdepreciaciones = await Hdepreciacion.findAll({
@@ -118,11 +119,27 @@ export const crearHdepreciaciones = async (req, res) => {
       where: { gestion: `${gestion + 1}` },
       raw: true,
     })
+    const activos = await Activo.findAll({
+      raw: true,
+      attributes: ['id_activo', 'costo', 'indice_ufv', 'descripcion_activo'],
+      where: {
+        estado: 'A', [Op.and]: [
+          Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('fecha_ingreso')), (gestion + 1)),
+        ]
+      }
+    });
     await Promise.all(hdepreciaciones.map(async hdepreciacion => {
       const { id_activo, valor_residual, ['activo.indice_ufv']: indice_ufv } = hdepreciacion
       const ajusteActualizacion = ((valor_residual / indice_ufv) * valor_ufv - valor_residual)
 
       await Hdepreciacion.create({ valor_residual: (ajusteActualizacion + valor_residual), id_activo, id_valor_ufv: valorUfv[0].id_valor_ufv })
+      return
+    }))
+    await Promise.all(activos.map(async activo => {
+      const { id_activo, costo, indice_ufv } = activo
+      const ajusteActualizacion = ((costo / indice_ufv) * valor_ufv - costo)
+
+      await Hdepreciacion.create({ valor_residual: (ajusteActualizacion + costo), id_activo, id_valor_ufv: valorUfv[0].id_valor_ufv })
       return
     }))
     res.status(200).json({ msj: 'Depreciaciones realizadas exitosamente', type: 'success' })
@@ -173,10 +190,20 @@ export const cuadroDepreciacion = async (req, res) => {
     const valorUfv = await ValorUfv.findAll({
       raw: true, where: { gestion }
     })
-
+    let td = 0, te = 0, tf = 0, tg = 0, th = 0, ti = 0, tj = 0, tk = 0, tl = 0
     const itemsActivos = await Promise.all(hdepreciaciones?.map(async activo => {
       const valores = await depreciacion(activo['activo.fecha_ingreso'], 12, gestion, activo['activo.grupo_contable.vida_util'], activo['activo.costo'], activo.valor_residual, activo['activo.indice_ufv'], valorUfv[0].valor)
       const { B, F, G, H, I, J, K, L } = valores;
+      td = td + Number(activo['activo.costo'])
+      te = te + Number(activo.valor_residual)
+      tf = tf + Number(F)
+      tg = tg + Number(G)
+      th = th + Number(H)
+      ti = ti + Number(I)
+      tj = tj + Number(J)
+      tk = tk + Number(K)
+      tl = tl + Number(L)
+
       return await {
         // ...activo,
         codigo: activo['activo.codigo_activo'],
@@ -196,7 +223,16 @@ export const cuadroDepreciacion = async (req, res) => {
       vida_util: itemsActivos[0]?.vida_util * 12,
       ufv_actual: valorUfv[0]?.valor,
       gestion,
-      data: itemsActivos
+      data: itemsActivos,
+      td:Number(td.toFixed(2)),
+      te:Number(te.toFixed(2)),
+      tf:Number(tf.toFixed(2)),
+      tg:Number(tg.toFixed(2)),
+      th:Number(th.toFixed(2)),
+      ti:Number(ti.toFixed(2)),
+      tj:Number(tj.toFixed(2)),
+      tk:Number(tk.toFixed(2)),
+      tl:Number(tl.toFixed(2))
     }
 
     if (isPdf) {
@@ -306,6 +342,8 @@ export const cuadroDepreciacion = async (req, res) => {
       ws.cell(5, 18).string('Actualizada').style(columnaEstilo)
       ws.cell(5, 19).string('Actualizado').style(columnaEstilo)
 
+      let pos = 6;
+
       itemsActivos.forEach((activo, index) => {
         ws.cell(index + 6, 1).string(valores.grupo_contable).style(contenidoEstilo)
         ws.cell(index + 6, 2).string(activo.codigo).style(contenidoEstilo)
@@ -325,7 +363,19 @@ export const cuadroDepreciacion = async (req, res) => {
         ws.cell(index + 6, 17).string(activo.J).style(contenidoEstilo)
         ws.cell(index + 6, 18).string(activo.K).style(contenidoEstilo)
         ws.cell(index + 6, 19).string(activo.L).style(contenidoEstilo)
+        pos++;
       });
+      ws.cell(pos, 5).string(`TOTAL ${valores.grupo_contable}`).style(columnaEstilo)
+      ws.cell(pos, 10).number(valores.td).style(contenidoEstilo)
+      ws.cell(pos, 11).number(valores.te).style(contenidoEstilo)
+      ws.cell(pos, 12).number(valores.tf).style(contenidoEstilo)
+      ws.cell(pos, 13).number(valores.tg).style(contenidoEstilo)
+      ws.cell(pos, 14).number(valores.th).style(contenidoEstilo)
+      ws.cell(pos, 16).number(valores.ti).style(contenidoEstilo)
+      ws.cell(pos, 17).number(valores.tj).style(contenidoEstilo)
+      ws.cell(pos, 18).number(valores.tk).style(contenidoEstilo)
+      ws.cell(pos, 19).number(valores.tl).style(contenidoEstilo)
+
 
       //Ruta del archivo
       const pathExcel = path.join(__dirname, 'excel', nombreArchivo + '.xlsx')
