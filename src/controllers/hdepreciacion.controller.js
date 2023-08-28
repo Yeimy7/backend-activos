@@ -142,7 +142,7 @@ export const crearHdepreciaciones = async (req, res) => {
       await Hdepreciacion.create({ valor_residual: (ajusteActualizacion + costo), id_activo, id_valor_ufv: valorUfv[0].id_valor_ufv })
       return
     }))
-    res.status(200).json({ msj: 'Depreciaciones realizadas exitosamente', type: 'success' })
+    res.status(200).json({ msg: 'Depreciaciones realizadas exitosamente', type: 'success' })
   } catch (error) {
     res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
