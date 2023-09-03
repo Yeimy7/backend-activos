@@ -1,4 +1,4 @@
-import Auxiliar from '../models/Auxiliar'
+import Auxiliar from '../models/Auxiliar.js'
 
 export const obtenerAuxiliares = async (_req, res) => {
   try {

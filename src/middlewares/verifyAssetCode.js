@@ -1,4 +1,4 @@
-import Activo from '../models/Activo'
+import Activo from '../models/Activo.js'
 
 export const checkDuplicateAssetCode = async (req, res, next) => {
   const activo = await Activo.findOne({ where: { codigo_activo: req.body.codigo_activo } })

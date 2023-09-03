@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as grupoController from '../controllers/grupo.controller'
+import * as grupoController from '../controllers/grupo.controller.js'
 import { authJwt } from '../middlewares'
 
 router.get('/', authJwt.verifyToken, grupoController.obtenerGrupos)

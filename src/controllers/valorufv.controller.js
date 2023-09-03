@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize'
 import { validationResult } from 'express-validator'
-import ValorUfv from '../models/ValorUfv'
+import ValorUfv from '../models/ValorUfv.js'
 
 export const crearValorUfv = async (req, res) => {
   // Revisar si hay errores

@@ -1,6 +1,6 @@
 import { validationResult } from 'express-validator'
-import Area from '../models/Area'
-import Cargo from '../models/Cargo'
+import Area from '../models/Area.js'
+import Cargo from '../models/Cargo.js'
 
 export const crearCargo = async (req, res) => {
   // Revisar si hay errores

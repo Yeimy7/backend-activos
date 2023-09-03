@@ -1,4 +1,4 @@
-import * as config from '../config/config'
+import * as config from '../config/config.js'
 import bcryptjs from 'bcryptjs'
 import fs from 'fs-extra'
 import handlebars from 'handlebars'
@@ -6,9 +6,9 @@ import jwt from 'jsonwebtoken'
 import path from 'path'
 import { WORD_SECRET } from '../config/config'
 import { transporter } from '../config/mailer'
-import Person from '../models/Person'
-import Role from '../models/Role'
-import User from '../models/User'
+import Person from '../models/Person.js'
+import Role from '../models/Role.js'
+import User from '../models/User.js'
 
 
 export const signin = async (req, res) => {

@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
+import conexion from '../config/db.js'
 
 const ValorUfv = conexion.define('valor_ufv', {
   id_valor_ufv: {

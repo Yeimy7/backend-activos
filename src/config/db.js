@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'
-import * as config from './config'
+import * as config from './config.js'
 
 //Parametros para la conexion a la base de datos
 const conectarDB = new Sequelize(

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as hdepreciacionController from '../controllers/hdepreciacion.controller'
+import * as hdepreciacionController from '../controllers/hdepreciacion.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
 

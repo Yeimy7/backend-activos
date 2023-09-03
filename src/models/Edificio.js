@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
+import conexion from '../config/db.js'
 
 const Edificio = conexion.define('edificio', {
   id_edificio: {

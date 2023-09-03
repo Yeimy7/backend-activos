@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Activo from './Activo'
-import Empleado from './Empleado'
+import conexion from '../config/db.js'
+import Activo from './Activo.js'
+import Empleado from './Empleado.js'
 
 const Devolucion = conexion.define('devolucion', {
   id_devolucion: {

@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Activo from './Activo'
-import Ambiente from './Ambiente'
+import conexion from '../config/db.js'
+import Activo from './Activo.js'
+import Ambiente from './Ambiente.js'
 
 const Traslado = conexion.define('traslado', {
   id_traslado: {

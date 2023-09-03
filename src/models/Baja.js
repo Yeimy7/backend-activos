@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Activo from './Activo'
+import conexion from '../config/db.js'
+import Activo from './Activo.js'
 
 const Baja = conexion.define('baja', {
   id_baja: {

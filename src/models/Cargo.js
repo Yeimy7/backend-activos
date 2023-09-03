@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Area from './Area'
+import conexion from '../config/db.js'
+import Area from './Area.js'
 
 const Cargo = conexion.define('cargo', {
   id_cargo: {

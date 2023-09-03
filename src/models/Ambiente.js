@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Piso from './Piso'
+import conexion from '../config/db.js'
+import Piso from './Piso.js'
 
 const Ambiente = conexion.define('ambiente', {
   id_ambiente: {

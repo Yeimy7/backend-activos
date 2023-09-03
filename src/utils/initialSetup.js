@@ -1,9 +1,9 @@
-import * as logger from '../utils/logger'
+import * as logger from '../utils/logger.js'
 import { QueryTypes } from 'sequelize'
-import conectarDB from '../config/db'
-import Role from '../models/Role'
-import GrupoContable from '../models/GrupoContable'
-import Auxiliar from '../models/Auxiliar'
+import conectarDB from '../config/db.js'
+import Role from '../models/Role.js'
+import GrupoContable from '../models/GrupoContable.js'
+import Auxiliar from '../models/Auxiliar.js'
 
 export const createRoles = async () => {
   await Role.estimated

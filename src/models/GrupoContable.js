@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
+import conexion from '../config/db.js'
 
 const GrupoContable = conexion.define('grupo_contable', {
   id_grupo: {

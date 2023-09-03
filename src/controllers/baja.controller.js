@@ -1,13 +1,13 @@
 import { crearPDF } from '../utils/generarPDF'
 import { validationResult } from 'express-validator'
-import Activo from '../models/Activo'
-import Ambiente from '../models/Ambiente'
-import Auxiliar from '../models/Auxiliar'
-import Baja from '../models/Baja'
-import Cargo from '../models/Cargo'
-import Empleado from '../models/Empleado'
-import GrupoContable from '../models/GrupoContable'
-import Person from '../models/Person'
+import Activo from '../models/Activo.js'
+import Ambiente from '../models/Ambiente.js'
+import Auxiliar from '../models/Auxiliar.js'
+import Baja from '../models/Baja.js'
+import Cargo from '../models/Cargo.js'
+import Empleado from '../models/Empleado.js'
+import GrupoContable from '../models/GrupoContable.js'
+import Person from '../models/Person.js'
 
 export const crearBaja = async (req, res) => {
   // Revisar si hay errores

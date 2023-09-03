@@ -1,8 +1,8 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Role from './Role'
+import conexion from '../config/db.js'
+import Role from './Role.js'
 import bcrypt from 'bcryptjs'
-import Person from './Person'
+import Person from './Person.js'
 
 const User = conexion.define('usuario', {
   id_persona: {

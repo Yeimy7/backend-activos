@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as trasladoController from '../controllers/traslado.controller'
+import * as trasladoController from '../controllers/traslado.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
 

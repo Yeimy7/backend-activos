@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator'
-import Edificio from '../models/Edificio'
+import Edificio from '../models/Edificio.js'
 
 export const crearEdificio = async (req, res) => {
   // Revisar si hay errores

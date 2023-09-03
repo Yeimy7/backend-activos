@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Ambiente from './Ambiente'
-import Auxiliar from './Auxiliar'
-import Empleado from './Empleado'
-import GrupoContable from './GrupoContable'
-import Proveedor from './Proveedor'
+import conexion from '../config/db.js'
+import Ambiente from './Ambiente.js'
+import Auxiliar from './Auxiliar.js'
+import Empleado from './Empleado.js'
+import GrupoContable from './GrupoContable.js'
+import Proveedor from './Proveedor.js'
 
 const Activo = conexion.define('activo', {
   id_activo: {

@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Cargo from './Cargo'
+import conexion from '../config/db.js'
+import Cargo from './Cargo.js'
 
 const Empleado = conexion.define('empleado', {
   id_persona: {

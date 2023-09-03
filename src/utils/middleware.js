@@ -1,4 +1,4 @@
-import * as logger from './logger'
+import * as logger from './logger.js'
 
 export const requestLogger = (request, _response, next) => {
   logger.info('Method:', request.method)

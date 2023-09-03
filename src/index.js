@@ -1,7 +1,7 @@
-import app from './app'
-import * as config from './config/config'
-import * as logger from './utils/logger'
-import conectarDB from './config/db'
+import app from './app.js'
+import * as config from './config/config.js'
+import * as logger from './utils/logger.js'
+import conectarDB from './config/db.js'
 
 // Conectar a la base de datos
 const conexion = async () => {

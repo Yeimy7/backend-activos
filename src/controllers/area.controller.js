@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator'
-import Area from '../models/Area'
+import Area from '../models/Area.js'
 
 export const crearArea = async (req, res) => {
   // Revisar si hay errores

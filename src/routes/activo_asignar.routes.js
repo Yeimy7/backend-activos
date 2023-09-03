@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as activoController from '../controllers/activo.controller'
+import * as activoController from '../controllers/activo.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
 

@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Edificio from './Edificio'
+import conexion from '../config/db.js'
+import Edificio from './Edificio.js'
 
 const Piso = conexion.define('piso', {
   id_piso: {

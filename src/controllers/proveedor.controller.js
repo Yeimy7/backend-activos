@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator'
-import Proveedor from '../models/Proveedor'
+import Proveedor from '../models/Proveedor.js'
 
 export const crearProveedor = async (req, res) => {
   // Revisar si hay errores

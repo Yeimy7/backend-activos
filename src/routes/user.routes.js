@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as userController from '../controllers/user.controller'
+import * as userController from '../controllers/user.controller.js'
 import { authJwt, veryfySignup } from '../middlewares'
 import { check } from 'express-validator'
 

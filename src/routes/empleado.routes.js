@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as empleadoController from '../controllers/empleado.controller'
+import * as empleadoController from '../controllers/empleado.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
 

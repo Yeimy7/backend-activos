@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as devolucionController from '../controllers/devolucion.controller'
+import * as devolucionController from '../controllers/devolucion.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
 

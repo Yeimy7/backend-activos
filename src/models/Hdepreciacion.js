@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize'
-import conexion from '../config/db'
-import Activo from './Activo'
-import ValorUfv from './ValorUfv'
+import conexion from '../config/db.js'
+import Activo from './Activo.js'
+import ValorUfv from './ValorUfv.js'
 
 const Hdepreciacion = conexion.define('hdepreciacion', {
   id_hdepreciacion: {

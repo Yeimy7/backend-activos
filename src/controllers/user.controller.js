@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator'
-import Person from '../models/Person'
-import Role from '../models/Role'
-import User from '../models/User'
+import Person from '../models/Person.js'
+import Role from '../models/Role.js'
+import User from '../models/User.js'
 
 export const createUser = async (req, res) => {
   // Revisar si hay errores

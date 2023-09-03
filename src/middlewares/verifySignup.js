@@ -1,5 +1,5 @@
-import Person from '../models/Person'
-import User from '../models/User'
+import Person from '../models/Person.js'
+import User from '../models/User.js'
 
 export const checkDuplicateUserNameOrEmail = async (req, res, next) => {
   const person = await Person.findOne({ where: { ci: req.body.ci } })

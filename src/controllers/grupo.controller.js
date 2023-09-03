@@ -1,5 +1,5 @@
-import Activo from '../models/Activo'
-import GrupoContable from '../models/GrupoContable'
+import Activo from '../models/Activo.js'
+import GrupoContable from '../models/GrupoContable.js'
 
 export const obtenerGrupos = async (_req, res) => {
   try {

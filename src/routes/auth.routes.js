@@ -1,9 +1,9 @@
 ﻿import { Router } from 'express'
 const router = Router()
-import * as authController from '../controllers/auth.controller'
+import * as authController from '../controllers/auth.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
-import multer from '../utils/multer'
+import multer from '../utils/multer.js'
 
 router.post('/signin', authController.signin)
 router.get('/profile', [authJwt.verifyToken], authController.profile)

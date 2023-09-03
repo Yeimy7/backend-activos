@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as ambienteController from '../controllers/ambiente.controller'
+import * as ambienteController from '../controllers/ambiente.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
 

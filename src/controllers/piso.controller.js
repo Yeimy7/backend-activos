@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator'
-import Piso from '../models/Piso'
+import Piso from '../models/Piso.js'
 
 export const crearPiso = async (req, res) => {
   // Revisar si hay errores

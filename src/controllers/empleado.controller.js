@@ -1,8 +1,8 @@
 import { validationResult } from 'express-validator'
-import Area from '../models/Area'
-import Cargo from '../models/Cargo'
-import Empleado from '../models/Empleado'
-import Person from '../models/Person'
+import Area from '../models/Area.js'
+import Cargo from '../models/Cargo.js'
+import Empleado from '../models/Empleado.js'
+import Person from '../models/Person.js'
 
 export const crearEmpleado = async (req, res) => {
   // Revisar si hay errores

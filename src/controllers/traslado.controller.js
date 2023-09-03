@@ -1,11 +1,11 @@
 import { crearPDF } from '../utils/generarPDF'
 import { validationResult } from 'express-validator'
-import Activo from '../models/Activo'
-import Ambiente from '../models/Ambiente'
-import Cargo from '../models/Cargo'
-import Empleado from '../models/Empleado'
-import Person from '../models/Person'
-import Traslado from '../models/Traslado'
+import Activo from '../models/Activo.js'
+import Ambiente from '../models/Ambiente.js'
+import Cargo from '../models/Cargo.js'
+import Empleado from '../models/Empleado.js'
+import Person from '../models/Person.js'
+import Traslado from '../models/Traslado.js'
 
 export const crearTraslado = async (req, res) => {
   // Revisar si hay errores

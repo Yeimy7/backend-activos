@@ -1,6 +1,6 @@
 import { Router } from 'express'
 const router = Router()
-import * as bajaController from '../controllers/baja.controller'
+import * as bajaController from '../controllers/baja.controller.js'
 import { authJwt } from '../middlewares'
 import { check } from 'express-validator'
 

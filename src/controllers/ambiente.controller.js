@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator'
-import Ambiente from '../models/Ambiente'
+import Ambiente from '../models/Ambiente.js'
 
 export const crearAmbiente = async (req, res) => {
   // Revisar si hay errores

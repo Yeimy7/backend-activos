@@ -5,12 +5,12 @@ import { crearPDF } from '../utils/generarPDF'
 import { depreciacion } from '../utils/cuadroDepreciacion'
 import { Op, Sequelize } from 'sequelize'
 import { validationResult } from 'express-validator'
-import Activo from '../models/Activo'
-import Auxiliar from '../models/Auxiliar'
-import GrupoContable from '../models/GrupoContable'
-import Hdepreciacion from '../models/HDepreciacion'
-import Proveedor from '../models/Proveedor'
-import ValorUfv from '../models/ValorUfv'
+import Activo from '../models/Activo.js'
+import Auxiliar from '../models/Auxiliar.js'
+import GrupoContable from '../models/GrupoContable.js'
+import Hdepreciacion from '../models/HDepreciacion.js'
+import Proveedor from '../models/Proveedor.js'
+import ValorUfv from '../models/ValorUfv.js'
 
 export const crearHdepreciacion = async (req, res) => {
   // Revisar si hay errores
@@ -187,6 +187,8 @@ export const cuadroDepreciacion = async (req, res) => {
           }
         ]
     })
+    console.log(hdepreciaciones)
+
     const valorUfv = await ValorUfv.findAll({
       raw: true, where: { gestion }
     })
@@ -218,21 +220,76 @@ export const cuadroDepreciacion = async (req, res) => {
         B: Number(B), F, G, H, I, J, K, L
       }
     }))
+
+    const activos = await Activo.findAll({
+      raw: true,
+      attributes: ['id_activo', 'costo', 'indice_ufv', 'descripcion_activo'],
+      where: {
+        estado: 'A', [Op.and]: [
+          Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('fecha_ingreso')), (gestion + 1)),
+        ]
+      },
+      include:
+        [
+          {
+            model: Auxiliar,
+            attributes: ['descripcion_aux']
+          },
+          {
+            model: GrupoContable,
+            attributes: ['descripcion_g', 'vida_util', 'coeficiente']
+          },
+          {
+            model: Proveedor,
+            attributes: ['razon_social']
+          },
+        ]
+    });
+    const itemsActivosNuevos = await Promise.all(activos?.map(async activo => {
+      const valores = await depreciacion(activo.fecha_ingreso, 12, gestion, activo['grupo_contable.vida_util'], activo.costo, activo.valor_residual, activo.indice_ufv, valorUfv[0].valor)
+      const { B, F, G, H, I, J, K, L } = valores;
+      // td = td + Number(activo.costo)
+      // te = te + Number(activo.valor_residual)
+      // tf = tf + Number(F)
+      // tg = tg + Number(G)
+      // th = th + Number(H)
+      // ti = ti + Number(I)
+      // tj = tj + Number(J)
+      // tk = tk + Number(K)
+      // tl = tl + Number(L)
+
+      return await {
+        // ...activo,
+        codigo: activo.codigo_activo,
+        grupo_contable: activo['grupo_contable.descripcion_g'],
+        auxiliar: activo['auxiliar.descripcion_aux'],
+        vida_util: activo['grupo_contable.vida_util'],
+        descripcion: activo.descripcion_activo,
+        A: activo.fecha_ingreso,
+        C: activo.indice_ufv,
+        D: activo.costo,
+        E: activo.valor_residual,
+        B: Number(B), F, G, H, I, J, K, L
+      }
+    }))
+
+    const nnn={...itemsActivos,...itemsActivosNuevos}
+    console.log(nnn)
     const valores = {
       grupo_contable: itemsActivos[0]?.grupo_contable,
       vida_util: itemsActivos[0]?.vida_util * 12,
       ufv_actual: valorUfv[0]?.valor,
       gestion,
       data: itemsActivos,
-      td:Number(td.toFixed(2)),
-      te:Number(te.toFixed(2)),
-      tf:Number(tf.toFixed(2)),
-      tg:Number(tg.toFixed(2)),
-      th:Number(th.toFixed(2)),
-      ti:Number(ti.toFixed(2)),
-      tj:Number(tj.toFixed(2)),
-      tk:Number(tk.toFixed(2)),
-      tl:Number(tl.toFixed(2))
+      td: Number(td.toFixed(2)),
+      te: Number(te.toFixed(2)),
+      tf: Number(tf.toFixed(2)),
+      tg: Number(tg.toFixed(2)),
+      th: Number(th.toFixed(2)),
+      ti: Number(ti.toFixed(2)),
+      tj: Number(tj.toFixed(2)),
+      tk: Number(tk.toFixed(2)),
+      tl: Number(tl.toFixed(2))
     }
 
     if (isPdf) {
@@ -405,6 +462,7 @@ export const cuadroDepreciacion = async (req, res) => {
       })
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({ msg: 'Error en el servidor, intente nuevemente', type: 'error' })
   }
 }
