@@ -1,5 +1,5 @@
 import express from 'express'
-import { createGrupoContable, createPiso, createRoles } from './utils/initialSetup.js'
+import { createGrupoContable, createRoles } from './utils/initialSetup.js'
 const app = express()
 // createRoles()
 // createGrupoContable()

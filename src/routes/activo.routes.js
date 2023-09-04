@@ -1,7 +1,9 @@
 import { Router } from 'express'
 const router = Router()
 import * as activoController from '../controllers/activo.controller.js'
-import { authJwt, veryfyAssetCode } from '../middlewares'
+// import { authJwt, veryfyAssetCode } from '../middlewares'
+import * as authJwt from '../middlewares/authJwt.js'
+import * as veryfyAssetCode from '../middlewares/verifyAssetCode.js'
 import { check } from 'express-validator'
 import multer from '../utils/multer.js'
 

@@ -1,7 +1,8 @@
 import { Router } from 'express'
 const router = Router()
 import * as userController from '../controllers/user.controller.js'
-import { authJwt, veryfySignup } from '../middlewares'
+import * as authJwt from '../middlewares/authJwt.js'
+import * as veryfySignup from '../middlewares/verifySignup.js'
 import { check } from 'express-validator'
 
 router.post('/',

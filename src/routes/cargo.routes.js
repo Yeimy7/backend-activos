@@ -1,7 +1,8 @@
 import { Router } from 'express'
 const router = Router()
 import * as cargoController from '../controllers/cargo.controller.js'
-import { authJwt } from '../middlewares'
+// import { authJwt } from '../middlewares'
+import * as authJwt from '../middlewares/authJwt.js'
 import { check } from 'express-validator'
 
 router.post('/',

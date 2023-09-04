@@ -1,7 +1,7 @@
 ﻿import { Router } from 'express'
 const router = Router()
 import * as authController from '../controllers/auth.controller.js'
-import { authJwt } from '../middlewares'
+import * as authJwt from '../middlewares/authJwt.js'
 import { check } from 'express-validator'
 import multer from '../utils/multer.js'
 

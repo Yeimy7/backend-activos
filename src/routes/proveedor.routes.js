@@ -1,7 +1,7 @@
 import { Router } from 'express'
 const router = Router()
 import * as proveedorController from '../controllers/proveedor.controller.js'
-import { authJwt } from '../middlewares'
+import * as authJwt from '../middlewares/authJwt.js'
 import { check } from 'express-validator'
 
 router.post('/',

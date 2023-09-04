@@ -1,4 +1,4 @@
-import { crearPDF } from '../utils/generarPDF'
+import { crearPDF } from '../utils/generarPDF.js'
 import { validationResult } from 'express-validator'
 import Activo from '../models/Activo.js'
 import Ambiente from '../models/Ambiente.js'

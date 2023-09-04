@@ -6,6 +6,7 @@ export const transporter = nodemailer.createTransport({
   port: 465,
   secure: true, // true for 465, false for other ports
   auth: {
+    // type:'OAuth2',  //Al ejecutar con node index.js
     user: config.EMAIL, // generated ethereal user
     pass: config.PASSWORD // generated ethereal password
   },

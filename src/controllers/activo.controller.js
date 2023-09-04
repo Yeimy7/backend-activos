@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 import xl from 'excel4node'
-import { crearPDF } from '../utils/generarPDF'
+import { crearPDF } from '../utils/generarPDF.js'
 import { Op } from 'sequelize'
 import { validationResult } from 'express-validator'
 import Activo from '../models/Activo.js'

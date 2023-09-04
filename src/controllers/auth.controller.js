@@ -1,11 +1,12 @@
 import * as config from '../config/config.js'
 import bcryptjs from 'bcryptjs'
 import fs from 'fs-extra'
+import { fileURLToPath } from 'url';
 import handlebars from 'handlebars'
 import jwt from 'jsonwebtoken'
 import path from 'path'
-import { WORD_SECRET } from '../config/config'
-import { transporter } from '../config/mailer'
+import { WORD_SECRET } from '../config/config.js'
+import { transporter } from '../config/mailer.js'
 import Person from '../models/Person.js'
 import Role from '../models/Role.js'
 import User from '../models/User.js'
@@ -144,7 +145,9 @@ export const forgotPassword = async (req, res) => {
   } catch (error) {
     return res.json({ msg: 'No se encontró el email del usuario', type: 'error' });
   }
+  const __filename = fileURLToPath(import.meta.url);
 
+  const __dirname = path.dirname(__filename);
   const filePath = path.join(__dirname, '../templates/email.hbs');
   const source = fs.readFileSync(filePath, 'utf-8');
   const template = handlebars.compile(source)({ link: linkVerificacion });
