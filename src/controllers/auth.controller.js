@@ -140,7 +140,7 @@ export const forgotPassword = async (req, res) => {
   try {
     usuario = await User.findOne({ where: { email } })
     const token = jwt.sign({ id: usuario.id_persona }, config.WORD_SECRET_RESET, { expiresIn: 600 })
-    linkVerificacion = `http://${config.DB_HOST}:${config.PORT_FRONT}/auth/new-password/${token}`;
+    linkVerificacion = `${config.URL_FRONT}/auth/new-password/${token}`;
     usuario.reset_token = token;
   } catch (error) {
     return res.json({ msg: 'No se encontró el email del usuario', type: 'error' });
@@ -154,13 +154,14 @@ export const forgotPassword = async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: '"Olvide la contraseña  👻" <virgeninaepdb@gmail.com>', // sender address
+      from: '"Olvide la contraseña  👻" <brielalica@gmail.com>', // sender address
       to: usuario.email, // list of receivers
       subject: "Olvide la contraseña", // Subject line
       html: template,
     });
   } catch (error) {
     emailStatus = error;
+    console.log(error)
     return res.status(400).json({ msg: 'algo salio mal, intente nuevamente', type: 'error' })
   }
   try {

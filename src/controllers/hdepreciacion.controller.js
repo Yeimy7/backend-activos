@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 import xl from 'excel4node'
+import { fileURLToPath } from 'url';
 import { crearPDF } from '../utils/generarPDF.js'
 import { depreciacion } from '../utils/cuadroDepreciacion.js'
 import { Op, Sequelize } from 'sequelize'
@@ -151,7 +152,6 @@ export const crearHdepreciaciones = async (req, res) => {
 export const cuadroDepreciacion = async (req, res) => {
   const { id_grupo, gestion, isPdf } = req.body;
   try {
-
     const hdepreciaciones = await Hdepreciacion.findAll({
       raw: true, include:
         [
@@ -187,13 +187,12 @@ export const cuadroDepreciacion = async (req, res) => {
           }
         ]
     })
-    console.log(hdepreciaciones)
 
     const valorUfv = await ValorUfv.findAll({
       raw: true, where: { gestion }
     })
     let td = 0, te = 0, tf = 0, tg = 0, th = 0, ti = 0, tj = 0, tk = 0, tl = 0
-    const itemsActivos = await Promise.all(hdepreciaciones?.map(async activo => {
+    let itemsActivos = await Promise.all(hdepreciaciones?.map(async activo => {
       const valores = await depreciacion(activo['activo.fecha_ingreso'], 12, gestion, activo['activo.grupo_contable.vida_util'], activo['activo.costo'], activo.valor_residual, activo['activo.indice_ufv'], valorUfv[0].valor)
       const { B, F, G, H, I, J, K, L } = valores;
       td = td + Number(activo['activo.costo'])
@@ -223,10 +222,10 @@ export const cuadroDepreciacion = async (req, res) => {
 
     const activos = await Activo.findAll({
       raw: true,
-      attributes: ['id_activo', 'costo', 'indice_ufv', 'descripcion_activo'],
+      attributes: ['id_activo', 'costo', 'indice_ufv', 'descripcion_activo', 'fecha_ingreso', 'valor_residual', 'codigo_activo'],
       where: {
         estado: 'A', [Op.and]: [
-          Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('fecha_ingreso')), (gestion + 1)),
+          Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('fecha_ingreso')), (gestion)),
         ]
       },
       include:
@@ -245,18 +244,19 @@ export const cuadroDepreciacion = async (req, res) => {
           },
         ]
     });
+    let tdd = 0, tee = 0, tff = 0, tgg = 0, thh = 0, tii = 0, tjj = 0, tkk = 0, tll = 0
     const itemsActivosNuevos = await Promise.all(activos?.map(async activo => {
       const valores = await depreciacion(activo.fecha_ingreso, 12, gestion, activo['grupo_contable.vida_util'], activo.costo, activo.valor_residual, activo.indice_ufv, valorUfv[0].valor)
       const { B, F, G, H, I, J, K, L } = valores;
-      // td = td + Number(activo.costo)
-      // te = te + Number(activo.valor_residual)
-      // tf = tf + Number(F)
-      // tg = tg + Number(G)
-      // th = th + Number(H)
-      // ti = ti + Number(I)
-      // tj = tj + Number(J)
-      // tk = tk + Number(K)
-      // tl = tl + Number(L)
+      tdd = tdd + Number(activo.costo)
+      tee = tee + Number(activo.valor_residual)
+      tff = tff + Number(F)
+      tgg = tgg + Number(G)
+      thh = thh + Number(H)
+      tii = tii + Number(I)
+      tjj = tjj + Number(J)
+      tkk = tkk + Number(K)
+      tll = tll + Number(L)
 
       return await {
         // ...activo,
@@ -273,23 +273,25 @@ export const cuadroDepreciacion = async (req, res) => {
       }
     }))
 
-    const nnn={...itemsActivos,...itemsActivosNuevos}
-    console.log(nnn)
+    itemsActivos = itemsActivos.concat(itemsActivosNuevos)
+    // console.log(itemsActivos)
+    // console.log(itemsActivosNuevos)
+    // // console.log(nnn)
     const valores = {
       grupo_contable: itemsActivos[0]?.grupo_contable,
       vida_util: itemsActivos[0]?.vida_util * 12,
       ufv_actual: valorUfv[0]?.valor,
       gestion,
       data: itemsActivos,
-      td: Number(td.toFixed(2)),
-      te: Number(te.toFixed(2)),
-      tf: Number(tf.toFixed(2)),
-      tg: Number(tg.toFixed(2)),
-      th: Number(th.toFixed(2)),
-      ti: Number(ti.toFixed(2)),
-      tj: Number(tj.toFixed(2)),
-      tk: Number(tk.toFixed(2)),
-      tl: Number(tl.toFixed(2))
+      td: Number((td + tdd).toFixed(2)),
+      te: Number((te + tee).toFixed(2)),
+      tf: Number((tf + tff).toFixed(2)),
+      tg: Number((tg + tgg).toFixed(2)),
+      th: Number((th + thh).toFixed(2)),
+      ti: Number((ti + tii).toFixed(2)),
+      tj: Number((tj + tjj).toFixed(2)),
+      tk: Number((tk + tkk).toFixed(2)),
+      tl: Number((tl + tll).toFixed(2))
     }
 
     if (isPdf) {
@@ -435,7 +437,11 @@ export const cuadroDepreciacion = async (req, res) => {
 
 
       //Ruta del archivo
-      const pathExcel = path.join(__dirname, 'excel', nombreArchivo + '.xlsx')
+      const __filename = fileURLToPath(import.meta.url);
+
+      const __dirname = path.dirname(__filename);
+      const pathExcel = path.join(__dirname, 'excel', nombreArchivo + '.xlsx');
+      // const pathExcel = path.join(__dirname, 'excel', nombreArchivo + '.xlsx')
 
       //Escribir o guardar
       wb.write(pathExcel, async (err, stats) => {

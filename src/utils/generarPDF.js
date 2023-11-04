@@ -4,7 +4,7 @@ import hbs from 'handlebars'
 import path from 'path'
 
 const compile = async (templateName, data) => {
-  const filePath = path.join(process.cwd(), 'src/templates', `${templateName}.hbs`);
+  const filePath = path.join(process.cwd(), '/templates', `${templateName}.hbs`);
   const html = fs.readFileSync(filePath, 'utf8');
   return hbs.compile(html)(data);
 }

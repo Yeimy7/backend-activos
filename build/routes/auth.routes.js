@@ -1,0 +1,14 @@
+import { Router } from 'express';
+const router = Router();
+import * as authController from '../controllers/auth.controller.js';
+import * as authJwt from '../middlewares/authJwt.js';
+import { check } from 'express-validator';
+import multer from '../utils/multer.js';
+router.post('/signin', authController.signin);
+router.get('/profile', [authJwt.verifyToken], authController.profile);
+router.put('/forgot-password', authController.forgotPassword);
+router.put('/new-password', authController.createNewPassword);
+router.put('/profile', [authJwt.verifyToken], authController.updateData);
+router.put('/profile/pwd', [authJwt.verifyToken], authController.updatePassword);
+router.put('/profile/img', [authJwt.verifyToken, multer.single('image')], authController.updateImageProfile);
+export default router;

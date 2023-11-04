@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Depreciación de activos</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    header,
+    footer {
+      background-color: #559ba1;
+    }
+
+    table th,
+    table td {
+      text-align: center;
+      font-size: 10px;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    h2 {
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 20px;
+    }
+
+    h4 {
+      font-size: 16px;
+    }
+
+    .firmas {
+      margin-block: 100px;
+    }
+
+    .linea {
+      border-top: 1px dotted #8f8f8f;
+    }
+
+    .fecha-center {
+      color: black;
+    }
+
+    .cabe {
+      /* min-width: 50px; */
+      word-break: break-all;
+      white-space: normal;
+    }
+
+    .data-col {
+      font-size: 12px;
+      padding: 10px 30px;
+      margin-top: 50px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="row p-3 text-white m-3">
+    <div class="col">
+      <p class="lh-sm">
+        <span class="d-block">Zona Los Andes - Calle Balboa</span>
+        <span class="d-block">El Alto - Bolivia</span>
+      </p>
+      <p>Fecha: El Alto <span id="fecha"></span></p>
+    </div>
+    <div id="logo" class="col text-center">
+      <img src="http://localhost:3000/logo.jpg" width="100" height="100" alt="logo" />
+    </div>
+    <div class="col text-right">
+      <h5>Asociación Centro Virgen Niña - EPDB</h5>
+      <p class="lh-sm">
+        <span class="d-block">Teléfono: (591-2) 2841126</span>
+        <span class="d-block">Email: virgenninaepdb@gmail.com</span>
+      </p>
+    </div>
+  </header>
+  <h1 class="text-center">CUADRO DE DEPRECIACIÓN DE ACTIVOS FIJOS</h1>
+  <p class="text-center fecha-center">De la gestión:  <span>{{data.gestion}}</span></p>
+  <section class="m-3">
+    <div class="container data">
+      <div class="row">
+        <div class="col-md-auto table-bordered data-col">
+          <b>Rubro:</b> {{data.grupo_contable}}
+        </div>
+        <div class="col-md-auto table-bordered data-col">
+          <b>Vida util:</b> {{data.vida_util}} meses
+        </div>
+        <div class="col-md-auto table-bordered data-col">
+          <b>UFV actual:</b> {{data.ufv_actual}}
+        </div>
+      </div>
+    </div>
+    <table class="table table-bordered">
+      <thead>
+        <tr class="table-danger">
+          <th>
+            <div class="cabe"> Código</div>
+          </th>
+          <th>
+            <div class="cabe"> Fecha ing.</div>
+          </th>
+          <th>
+            <div class="cabe"> Descripción</div>
+          </th>
+          <th>
+            <div class="cabe"> Vida restante</div>
+          </th>
+          <th>
+            <div class="cabe"> UFV inicial</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor inicial</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor residual</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor actualizado</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor final act</div>
+          </th>
+          <th>
+            <div class="cabe"> Dep mensual</div>
+          </th>
+          <th>
+            <div class="cabe"> Dep acumulada</div>
+          </th>
+          <th>
+            <div class="cabe"> Ajuste actualizacion</div>
+          </th>
+          <th>
+            <div class="cabe"> Dep actualizada</div>
+          </th>
+          <th>
+            <div class="cabe"> Valor residual act</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each data.data as | activo |}}
+        <tr>
+          <td>{{activo.codigo}}</td>
+          <td>{{activo.A}}</td>
+          <td>{{activo.descripcion}}</td>
+          <td>{{activo.B}}</td>
+          <td>{{activo.C}}</td>
+          <td>{{activo.D}}</td>
+          <td>{{activo.E}}</td>
+          <td>{{activo.F}}</td>
+          <td>{{activo.G}}</td>
+          <td>{{activo.H}}</td>
+          <td>{{activo.I}}</td>
+          <td>{{activo.J}}</td>
+          <td>{{activo.K}}</td>
+          <td>{{activo.L}}</td>
+        </tr>
+        {{/each}}
+         <tr>
+          <td></td>
+          <td></td>
+          <td>TOTAL {{data.grupo_contable}} </td>
+          <td></td>
+          <td></td>
+          <td>{{data.td}}</td>
+          <td>{{data.te}}</td>
+          <td>{{data.tf}}</td>
+          <td>{{data.tg}}</td>
+          <td>{{data.th}}</td>
+          <td>{{data.ti}}</td>
+          <td>{{data.tj}}</td>
+          <td>{{data.tk}}</td>
+          <td>{{data.tl}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    let today = new Date();
+    let month = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    document.getElementById("fecha").innerHTML += `${today.getDate()} de ${month[today.getMonth()]} de ${today.getFullYear()}`;
+    document.getElementById("fecha1").innerHTML += `${today.getDate()} de ${month[today.getMonth()]} de ${today.getFullYear()}`;
+  </script>
+</body>
+
+</html>
